@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-<<<<<<< HEAD
 import 'package:migra_app/core/themes/app_theme.dart';
-=======
 import 'package:migra_app/screens/home_screen.dart';
->>>>>>> iosfixed
 import 'screens/login_screen.dart';
 import 'screens/report_map_screen.dart';
 
@@ -22,7 +19,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Immigration Alert App',
-<<<<<<< HEAD
       debugShowCheckedModeBanner: true,
       // initialRoute: '/login', // or '/map' if logged in
       // routes: {
@@ -33,10 +29,8 @@ class MyApp extends StatelessWidget {
       // },
       theme: AppTheme.lightTheme,
       home: ReportMapScreen(),
-=======
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomeScreen(),
->>>>>>> iosfixed
     );
   }
 }
