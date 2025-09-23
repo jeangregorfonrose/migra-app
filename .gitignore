@@ -45,7 +45,7 @@ app.*.map.json
 /android/app/release
 
 # API Keys
-ios/Runner/GoogleService-Info.plist
-lib/firebase_options.dart
-android/app/google-services.json
-android/app/src/main/AndroidManifest.xml
+*ios/Runner/GoogleService-Info.plist
+*lib/firebase_options.dart
+*android/app/google-services.json
+*android/app/src/main/AndroidManifest.xml
