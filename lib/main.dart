@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:migra_app/core/router.dart';
 import 'package:migra_app/core/themes/app_theme.dart';
 import 'package:migra_app/firebase_options.dart';
+import 'package:migra_app/screens/chatgpt_report.dart';
 import 'package:migra_app/screens/home_screen.dart';
 
 void main() async {
@@ -20,12 +21,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MaterialApp(
       title: 'Immigration Alert App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      routerConfig: appRouter,
+      home: const ReportMapV2Page(),
     );
+
+    // MaterialApp.router(
+    //   title: 'Immigration Alert App',
+    //   debugShowCheckedModeBanner: false,
+    //   theme: AppTheme.lightTheme,
+    //   routerConfig: appRouter,
+    // );
   }
 }
 
