@@ -23,5 +23,6 @@ class ApiClient {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     // add Auth token if needed
-  };
+    };
+  }
 }
