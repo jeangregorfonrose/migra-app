@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:migra_app/core/router.dart';
 import 'package:migra_app/core/themes/app_theme.dart';
 import 'package:migra_app/firebase_options.dart';
-import 'package:migra_app/screens/chatgpt_report.dart';
+import 'package:migra_app/providers/app_data.dart';
 import 'package:migra_app/screens/home_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +16,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(create: (_) => AppData(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -27,20 +30,6 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       routerConfig: appRouter,
     );
-
-    // MaterialApp(
-    //   title: 'Immigration Alert App',
-    //   debugShowCheckedModeBanner: false,
-    //   theme: AppTheme.lightTheme,
-    //   home: const ReportMapV2Page(),
-    // );
-
-    // MaterialApp.router(
-    //   title: 'Immigration Alert App',
-    //   debugShowCheckedModeBanner: false,
-    //   theme: AppTheme.lightTheme,
-    //   routerConfig: appRouter,
-    // );
   }
 }
 
@@ -54,26 +43,34 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   bool _signingIn = false;
   String? _error;
+  bool _authReady = false; // we got at least one auth event
+  StreamSubscription<User?>? _sub;
 
   @override
   void initState() {
     super.initState();
     _ensureSignedIn();
+
+    // Subscribe to auth changes OUTSIDE build
+    _sub = FirebaseAuth.instance.authStateChanges().listen((user) {
+      context.read<AppData>().updateUser(user!); // safe here
+      if (mounted && !_authReady) setState(() => _authReady = true);
+    }, onError: (e) {
+      if (mounted && !_authReady) setState(() => _authReady = true);
+    });
   }
 
   Future<void> _ensureSignedIn() async {
     final auth = FirebaseAuth.instance;
-    if (auth.currentUser != null) return; // already signed in
-
-    setState(() {
-      _signingIn = true;
-      _error = null;
-    });
+    if (auth.currentUser != null) {
+      // we’ll still wait for the stream event to flip _authReady
+      return;
+    }
+    setState(() { _signingIn = true; _error = null; });
 
     try {
       await auth.signInAnonymously();
     } on FirebaseAuthException catch (e) {
-      // e.code can be 'operation-not-allowed' if Anonymous not enabled
       setState(() => _error = '${e.code}: ${e.message}');
     } catch (e) {
       setState(() => _error = e.toString());
@@ -83,18 +80,21 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (_signingIn) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    if (_signingIn || !_authReady) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     if (_error != null) {
       return Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -104,32 +104,15 @@ class _AuthGateState extends State<AuthGate> {
                 const SizedBox(height: 8),
                 Text(_error!, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _ensureSignedIn,
-                  child: const Text('Try again'),
-                ),
+                ElevatedButton(onPressed: _ensureSignedIn, child: const Text('Try again')),
               ],
             ),
           ),
         ),
       );
     }
-
-    // At this point, user should exist (anonymous or otherwise).
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-        final user = snap.data;
-        if (user == null) {
-          // Rare edge case: not signed in and no error – retry.
-          _ensureSignedIn();
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-        return HomeScreen(user: user);
-      },
-    );
+    // Auth stream delivered a user (possibly anonymous) → show the app
+    return const HomeScreen();
   }
 }
+

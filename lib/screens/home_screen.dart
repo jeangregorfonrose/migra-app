@@ -1,13 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:migra_app/core/utils/constants.dart';
 import 'package:migra_app/core/utils/location.dart';
+import 'package:migra_app/providers/app_data.dart';
 import 'package:migra_app/screens/chatgpt_report.dart';
+import 'package:migra_app/widgets/report_map.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  final User user;
-  const HomeScreen({super.key, required this.user});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    getUserLocation();
+    loadUserLocation();
   }
 
   void loadUserLocation() async {
@@ -32,6 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
         _locationGranted = true;
         _currentPosition = position;
       });
+
+      if(mounted) {
+        Provider.of<AppData>(context, listen: false).updateUserPosition(position, false);
+      }
     } catch (e) {
       if (e.toString() == AppConstants.locationServicesDisabled) {
         setState(() {
@@ -50,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     Widget child;
 
+    // To Review
     if (!_locationEnabled) {
       child = const Text(AppConstants.locationServicesDisabledInfo, textAlign: TextAlign.center);
     } else if (_locationEnabled && !_locationGranted) {
@@ -57,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_locationEnabled && _locationGranted && _currentPosition == null) {
       child = const CircularProgressIndicator();
     } else if (_currentPosition != null) {
-      child = const ReportMapV2Page();
+      child = const ReportMap();
     } else {
       child = const SizedBox.shrink();
     }
