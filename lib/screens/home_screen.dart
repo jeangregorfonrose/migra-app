@@ -48,11 +48,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+
+    if (!_locationEnabled) {
+      child = const Text(AppConstants.locationServicesDisabledInfo, textAlign: TextAlign.center);
+    } else if (_locationEnabled && !_locationGranted) {
+      child = const Text(AppConstants.locationPermissionDeniedInfo, textAlign: TextAlign.center);
+    } else if (_locationEnabled && _locationGranted && _currentPosition == null) {
+      child = const CircularProgressIndicator();
+    } else if (_currentPosition != null) {
+      child = const ReportMapV2Page();
+    } else {
+      child = const SizedBox.shrink();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppConstants.appBarTitle),
       ),
-      body: ReportMapV2Page()
+      body: Center(
+        child: child,
+      ),
     );
   }
 }

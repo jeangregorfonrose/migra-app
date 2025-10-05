@@ -6,7 +6,10 @@ class AppConstants {
 
   // App Bar
   static const String appBarTitle = 'Rapo Imigrasyon';
-  
+
+  // Info Messages
+  static const String locationServicesDisabledInfo = 'Location services are disabled. Please enable them in your device settings.';
+  static const String locationPermissionDeniedInfo = 'Location permission is denied. Please grant permission in your device settings.';
 
   // Error messages
   static const String locationServicesDisabled = 'Location services are disabled.';
