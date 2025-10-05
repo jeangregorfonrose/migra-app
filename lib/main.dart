@@ -21,12 +21,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Immigration Alert App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const ReportMapV2Page(),
+      routerConfig: appRouter,
     );
+
+    // MaterialApp(
+    //   title: 'Immigration Alert App',
+    //   debugShowCheckedModeBanner: false,
+    //   theme: AppTheme.lightTheme,
+    //   home: const ReportMapV2Page(),
+    // );
 
     // MaterialApp.router(
     //   title: 'Immigration Alert App',

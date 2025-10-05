@@ -3,6 +3,9 @@ class AppConstants {
 
   static const String appName = 'Migra App';
   static const String apiBaseUrl = 'update_with_your_api_url';
+
+  // App Bar
+  static const String appBarTitle = 'Rapo Imigrasyon';
   
 
   // Error messages
