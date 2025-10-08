@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_locationEnabled && _locationGranted && _currentPosition == null) {
       child = const CircularProgressIndicator();
     } else if (_currentPosition != null) {
-      child = const ReportMap();
+      child = const ReportMapV2Page();
     } else {
       child = const SizedBox.shrink();
     }

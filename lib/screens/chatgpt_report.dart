@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:math' as math; // for Random + screen point
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
+import 'package:migra_app/providers/app_data.dart';
+import 'package:provider/provider.dart';
 
 /// Simple report model
 class Report {
@@ -394,6 +397,8 @@ class _ReportMapV2PageState extends State<ReportMapV2Page>
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context, listen: false);
+    Position? userPosition = appData.getUserPosition;
     return Scaffold(
       body: Stack(
         children: [
@@ -402,7 +407,7 @@ class _ReportMapV2PageState extends State<ReportMapV2Page>
             styleUri: mbx.MapboxStyles.MAPBOX_STREETS, // <- built-in style
             cameraOptions: mbx.CameraOptions(
               center: mbx.Point(
-                coordinates: mbx.Position(_initialCenterLng, _initialCenterLat),
+                coordinates: mbx.Position(userPosition?.longitude as num, userPosition?.latitude as num),
               ),
               zoom: 12.5,
             ),
