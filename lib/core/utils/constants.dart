@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._(); // Private constructor to prevent instantiation
 
   static const String appName = 'Migra App';
-  static const String apiBaseUrl = 'update_with_your_api_url';
+  static const String apiBaseUrl = 'https://migra-backend.onrender.com/';
 
   // App Bar
   static const String appBarTitle = 'Rapo Imigrasyon';
