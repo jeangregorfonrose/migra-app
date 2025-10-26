@@ -3,8 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:migra_app/core/utils/constants.dart';
 import 'package:migra_app/core/utils/location.dart';
 import 'package:migra_app/providers/app_data.dart';
-import 'package:migra_app/screens/chatgpt_report.dart';
-import 'package:migra_app/widgets/report_map.dart';
+import 'package:migra_app/screens/map_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -63,17 +62,16 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_locationEnabled && _locationGranted && _currentPosition == null) {
       child = const CircularProgressIndicator();
     } else if (_currentPosition != null) {
-      child = const ReportMapV2Page();
+      child = const MapScreen();
     } else {
       child = const SizedBox.shrink();
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppConstants.appBarTitle),
-      ),
-      body: Center(
-        child: child,
+      body: SafeArea(
+        child: Center(
+          child: child,
+        ),
       ),
     );
   }
