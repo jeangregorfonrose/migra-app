@@ -10,9 +10,13 @@ class AppData extends ChangeNotifier {
   static const double defaultCenterLng = -74.0060; // NYC
 
   // Setters
-  void updateUser(User newUser) {
+  Future<void> updateUser(User newUser) async {
     user = newUser;
     print("User Updated");
+    // Get a fresh ID token (JWT)
+    // final idToken = await user?.getIdToken(true);
+    // print(idToken);
+    // print("UUID: ${user!.uid}");
     notifyListeners();
   }
 
@@ -26,7 +30,20 @@ class AppData extends ChangeNotifier {
 
   // Getters
   User? get getUser => user;
-  Position get getUserPosition => userPosition ?? Position(longitude: defaultCenterLng, latitude: defaultCenterLat, timestamp: DateTime.now(), accuracy: 0, altitude: 0, altitudeAccuracy: 0, heading: 0, headingAccuracy: 0, speed: 0, speedAccuracy: 0);
+  Position get getUserPosition =>
+      userPosition ??
+      Position(
+        longitude: defaultCenterLng,
+        latitude: defaultCenterLat,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        headingAccuracy: 0,
+        speed: 0,
+        speedAccuracy: 0,
+      );
   double get getDefaultCenterLat => defaultCenterLat;
   double get getDefaultCenterLng => defaultCenterLng;
 }
