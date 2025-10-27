@@ -105,7 +105,7 @@ class _MapScreenState extends State<MapScreen>
                   userPosition.latitude,
                 ),
               ),
-              zoom: 14.0,
+              zoom: 12.0,
             ),
             onMapCreated: (mbx.MapboxMap mapboxMap) async{
               _map = mapboxMap;
