@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
+import 'package:migra_app/providers/app_data.dart';
+import 'package:provider/provider.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -87,11 +90,23 @@ class _MapScreenState extends State<MapScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Get User Position
+    final appData = Provider.of<AppData>(context, listen: false);
+    Position userPosition = appData.getUserPosition;
     return Scaffold(
       body: Stack(
         children: [
           mbx.MapWidget(
             styleUri: mbx.MapboxStyles.LIGHT,
+            cameraOptions: mbx.CameraOptions(
+              center: mbx.Point(
+                coordinates: mbx.Position(
+                  userPosition.longitude,
+                  userPosition.latitude,
+                ),
+              ),
+              zoom: 14.0,
+            ),
             onMapCreated: (mbx.MapboxMap mapboxMap) async{
               _map = mapboxMap;
 
