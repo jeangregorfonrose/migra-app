@@ -193,14 +193,14 @@ class _MapScreenState extends State<MapScreen>
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          FloatingActionButton(
+          _isPlacingMarker ? Container() : FloatingActionButton(
             heroTag: 'fab_report',
             onPressed: () => _startPlacingReportPin(),
             backgroundColor: Theme.of(context).primaryColor,
             child: const Icon(Icons.add_location_alt),
           ),
           const SizedBox(height: 12),
-          FloatingActionButton(
+          _isPlacingMarker ? Container() :FloatingActionButton(
             heroTag: 'fab_focus',
             onPressed: () => print('Focus button pressed'),
             child: const Icon(Icons.adjust_rounded),
