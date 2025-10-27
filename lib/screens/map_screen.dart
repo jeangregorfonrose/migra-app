@@ -71,13 +71,21 @@ class _MapScreenState extends State<MapScreen>
   }
 
   // Confirm placement of report pin
-  void _confirmLocation() {
-    if(_draftCoord != null) {
-      print('Report pin placed at: ${_draftCoord!.lat}, ${_draftCoord!.lng}');
-      setState(() {
-        _isPlacingMarker = false;
-      });
+  void _confirmLocationAndOpentSheet() {
+    if(_draftCoord == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: No location selected'))
+      );
+      return;
     }
+
+    print('Report pin placed at: ${_draftCoord!.lat}, ${_draftCoord!.lng}');
+
+    setState(() {
+      _isPlacingMarker = false;
+    });
+
+    _openSubmitReportSheet(_draftCoord!);
   }
 
   // Cancel placement of report pin
@@ -86,6 +94,64 @@ class _MapScreenState extends State<MapScreen>
       _isPlacingMarker = false;
       _draftCoord = null;
     });
+  }
+
+  void _openSubmitReportSheet(mbx.Position position) {
+    String type = 'sighting'; // default type
+    double severity = 2;
+    final descriptionCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+            top: 16,
+            left: 16,
+            right: 16,
+          ),
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  const Text(
+                    'Submit Report',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                  ),
+
+                  // Spacing
+                  const SizedBox(height: 8),
+
+                  // Location
+                  Text(
+                    'Location: (${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey)
+                  ),
+
+                  // Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      label: const Text('Submit Report'),
+                      icon: const Icon(Icons.send),
+                      onPressed: () => print('Report submitted!'),
+                    )
+                  )
+                ],
+              );
+            }
+          )
+        );
+      },
+    );
   }
 
   @override
@@ -170,7 +236,7 @@ class _MapScreenState extends State<MapScreen>
                   SizedBox(width: 16),
                   FloatingActionButton.extended(
                     heroTag: 'confirm',
-                    onPressed: _confirmLocation,
+                    onPressed: _confirmLocationAndOpentSheet,
                     backgroundColor: Colors.green,
                     icon: Icon(Icons.check),
                     label: Text('Confirm'),
