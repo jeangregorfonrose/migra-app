@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import 'package:migra_app/providers/app_data.dart';
@@ -64,9 +63,9 @@ class _MapScreenState extends State<MapScreen>
         setState(() {
           _draftCoord = mbx.Position(center.coordinates.lng, center.coordinates.lat);
         });
-        print('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
+        // print('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
       }).catchError((e) {
-        print('Failed to get camera state: $e');
+        // print('Failed to get camera state: $e');
       });
     }
   }
@@ -81,6 +80,7 @@ class _MapScreenState extends State<MapScreen>
     }
   }
 
+  // Cancel placement of report pin
   void _cancelPlacement() {
     setState(() {
       _isPlacingMarker = false;
@@ -107,36 +107,13 @@ class _MapScreenState extends State<MapScreen>
               ),
               zoom: 12.0,
             ),
-            onMapCreated: (mbx.MapboxMap mapboxMap) async{
+            onCameraChangeListener: _onCameraChange,
+            onMapCreated: (mbx.MapboxMap mapboxMap) async {
               _map = mapboxMap;
 
               // Wait for style to load
               await Future.delayed(Duration(milliseconds: 500));
-
-              try{
-                // Load custom image as marker
-                final ByteData bytes = await rootBundle.load('assets/icons/pin_marker.png');
-                final Uint8List imageData = bytes.buffer.asUint8List();
-                
-                // Use addStyleImage instead of addImage
-                await _map?.style.addStyleImage(
-                  'pin-marker',
-                  1.0, // scale
-                  mbx.MbxImage(
-                    width: 512, // your image width
-                    height: 512, // your image height
-                    data: imageData,
-                  ),
-                  false, // sdf (signed distance field)
-                  [], // stretchX
-                  [], // stretchY
-                  null, // content
-                );
-                print('✅ Custom marker image loaded');
-              } catch (e) {
-                print('❌ Error loading marker image: $e');
-              }
-            },
+            }
           ),
 
           // Fixed pin overlay in center of screen
