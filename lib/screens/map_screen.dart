@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
+import 'package:http/http.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
+import 'package:migra_app/api/api_client.dart';
+import 'package:migra_app/api/report_api.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +18,9 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen>
     with SingleTickerProviderStateMixin {
+  // API client
+  final ReportApi _reportApi = ReportApi(ApiClient(Client()));
+
   // ---------- Map setup ----------
   late String accessToken; // access token for the mapbox account, will be set in initState from env
   static const String _styleUri = 'mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID';
@@ -21,8 +29,6 @@ class _MapScreenState extends State<MapScreen>
 
   // ---------- Report Submission State ----------
   bool _isPlacingMarker = false;
-  //mbx.PointAnnotationManager? _draftMgr;
-  //mbx.PointAnnotation? _draftPin;
   mbx.Position? _draftCoord; // longitude, latitude
 
   @override
