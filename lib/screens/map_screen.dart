@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import 'package:migra_app/api/api_client.dart';
 import 'package:migra_app/api/report_api.dart';
+import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:provider/provider.dart';
 
@@ -206,7 +207,7 @@ class _MapScreenState extends State<MapScreen>
               right: 0,
               child: Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.black87,
                     borderRadius: BorderRadius.circular(25),
@@ -226,7 +227,7 @@ class _MapScreenState extends State<MapScreen>
           // Confirm/Cancel buttons when placing marker
           if (_isPlacingMarker)
             Positioned(
-              bottom: 100,
+              bottom: 50,
               left: 0,
               right: 0,
               child: Row(
@@ -235,17 +236,17 @@ class _MapScreenState extends State<MapScreen>
                   FloatingActionButton.extended(
                     heroTag: 'cancel',
                     onPressed: _cancelPlacement,
-                    backgroundColor: Colors.grey[700],
                     icon: Icon(Icons.close),
                     label: Text('Cancel'),
+                    backgroundColor: AppColors.cancelButtonBackground,
                   ),
                   SizedBox(width: 16),
                   FloatingActionButton.extended(
                     heroTag: 'confirm',
                     onPressed: _confirmLocationAndOpentSheet,
-                    backgroundColor: Colors.green,
                     icon: Icon(Icons.check),
                     label: Text('Confirm'),
+                    backgroundColor: AppColors.confirmButtonBackground,
                   ),
                 ],
               ),
@@ -260,14 +261,13 @@ class _MapScreenState extends State<MapScreen>
           _isPlacingMarker ? Container() : FloatingActionButton(
             heroTag: 'fab_report',
             onPressed: () => _startPlacingReportPin(),
-            backgroundColor: Theme.of(context).primaryColor,
-            child: const Icon(Icons.add_location_alt),
+            child: const Icon(Icons.add_location_alt, color: AppColors.white,),
           ),
           const SizedBox(height: 12),
           _isPlacingMarker ? Container() :FloatingActionButton(
             heroTag: 'fab_focus',
             onPressed: () => print('Focus button pressed'),
-            child: const Icon(Icons.adjust_rounded),
+            child: const Icon(Icons.adjust_rounded, color: AppColors.white,),
           ),
         ],
       ),

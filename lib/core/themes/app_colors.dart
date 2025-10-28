@@ -49,4 +49,8 @@ class AppColors {
   static const unselectedTransparent = Color(0x00000000);
 
   static const unselectedShadow = Color(0x44000000);
+
+  // buttons
+  static const confirmButtonBackground = Color.fromARGB(255, 45, 239, 81);
+  static const cancelButtonBackground = Color.fromARGB(255, 249, 61, 61);
 }
