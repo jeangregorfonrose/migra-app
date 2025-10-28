@@ -10,7 +10,7 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         foregroundColor: AppColors.white,
       ),
     ),
@@ -28,7 +28,7 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primaryDark,
         textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(

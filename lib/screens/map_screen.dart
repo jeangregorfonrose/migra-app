@@ -143,15 +143,34 @@ class _MapScreenState extends State<MapScreen>
                     style: const TextStyle(fontSize: 14, color: Colors.grey)
                   ),
 
+                  // Description of report
+                  const Text("Note (optional)"),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: descriptionCtrl,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText:
+                          "Brief details (e.g., uniforms, vehicles, time)",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+
+                  // Spacing
+                  const SizedBox(height: 20),
+
                   // Submit Button
                   SizedBox(
                     width: double.infinity,
+                    height: 50,
                     child: ElevatedButton.icon(
                       label: const Text('Submit Report'),
                       icon: const Icon(Icons.send),
                       onPressed: () => print('Report submitted!'),
                     )
-                  )
+                  ),
+                  
+                  const SizedBox(height: 20),
                 ],
               );
             }
