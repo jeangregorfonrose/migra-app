@@ -1,28 +1,38 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:migra_app/core/utils/constants.dart';
 
 class ApiClient {
   static const String baseUrl = AppConstants.apiBaseUrl;
-
   final http.Client _http;
+  final user = FirebaseAuth.instance.currentUser;
 
   ApiClient(this._http);
 
   Future<http.Response> get(String path) async {
     final uri = Uri.parse('$baseUrl$path');
-    return await _http.get(uri, headers: _headers());
+    return await _http.get(uri, headers: await _headers());
   }
 
-  Future<http.Response> post (String path, {Object? body}) async {
+  Future<http.Response> post(String path, {Object? body}) async {
     final uri = Uri.parse('$baseUrl$path');
-    return await _http.post(uri, headers: _headers(), body: body);
+    return await _http.post(uri, headers: await _headers(), body: body);
   }
 
-  Map<String, String> _headers() {
+  Future<Map<String, String>> _headers() async {
+    String? idToken;
+    // get auth token if user is logged in
+    try {
+       idToken = await user?.getIdToken();
+      print('Fresh token: $idToken');
+    } catch (e) {
+      print('Error fetching token: $e');
+    }
+
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-    // add Auth token if needed
+      if (idToken != null) 'Authorization': 'Bearer $idToken',
     };
   }
 }
