@@ -180,6 +180,24 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
+  void _focusOnUserLocation() async {
+    if(_map == null) return;
+
+    final appData = Provider.of<AppData>(context, listen: false);
+    Position userPosition = appData.getUserPosition;
+
+    await _map!.setCamera(
+      mbx.CameraOptions(
+        center: mbx.Point(
+          coordinates: mbx.Position(
+            userPosition.longitude,
+            userPosition.latitude,
+          ),
+        ),
+        zoom: 12.0,
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     // Get User Position
@@ -279,13 +297,13 @@ class _MapScreenState extends State<MapScreen>
         children: [
           _isPlacingMarker ? Container() : FloatingActionButton(
             heroTag: 'fab_report',
-            onPressed: () => _startPlacingReportPin(),
+            onPressed: _startPlacingReportPin,
             child: const Icon(Icons.add_location_alt, color: AppColors.white,),
           ),
           const SizedBox(height: 12),
           _isPlacingMarker ? Container() :FloatingActionButton(
             heroTag: 'fab_focus',
-            onPressed: () => print('Focus button pressed'),
+            onPressed: _focusOnUserLocation,
             child: const Icon(Icons.adjust_rounded, color: AppColors.white,),
           ),
         ],
