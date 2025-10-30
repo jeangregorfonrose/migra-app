@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import 'package:migra_app/api/api_client.dart';
 import 'package:migra_app/api/report_api.dart';
+import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,10 @@ class _MapScreenState extends State<MapScreen>
   // API client
   final ReportApi _reportApi = ReportApi(ApiClient(Client()));
 
+  // list of reports to display on map
+  // List<Report> _reports = [];
+  late Future<List<Report>> _reportsFuture;
+
   // ---------- Map setup ----------
   late String accessToken; // access token for the mapbox account, will be set in initState from env
   static const String _styleUri = 'mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID';
@@ -35,6 +40,14 @@ class _MapScreenState extends State<MapScreen>
   @override
   void initState() {
     super.initState();
+
+    // fetch reports from backend
+    _reportsFuture = _reportApi.fetchReports();
+    _reportsFuture.then((reports) {
+      print(reports);
+    }).catchError((error) {
+      print('Error fetching reports: $error');
+    });
 
     // ---------- Mapbox setup ----------
     accessToken = const String.fromEnvironment("ACCESS_TOKEN");
