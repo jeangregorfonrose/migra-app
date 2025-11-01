@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import 'package:migra_app/api/api_client.dart';
 import 'package:migra_app/api/report_api.dart';
+import 'package:migra_app/core/models/location_model.dart';
 import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/providers/app_data.dart';
@@ -179,7 +180,7 @@ class _MapScreenState extends State<MapScreen>
                     child: ElevatedButton.icon(
                       label: const Text('Submit Report'),
                       icon: const Icon(Icons.send),
-                      onPressed: () => print('Report submitted!'),
+                      onPressed: () => _submitReport(descriptionCtrl.text),
                     )
                   ),
                   
@@ -211,6 +212,30 @@ class _MapScreenState extends State<MapScreen>
       ),
     );
   }
+
+  void _submitReport(String description) {
+    // Create a new report
+    Report newReport = Report(
+      id: '',
+      location: Location(type: "Point", coordinates: [
+        _draftCoord!.lng.toDouble(),
+        _draftCoord!.lat.toDouble()
+      ]),
+      description: description,
+      timestamp: DateTime.now()
+    );
+
+    // Call the API to submit the report
+    _reportApi.createReport(newReport).then((report) {
+      print('Report submitted: $report');
+
+      // Closing Bottom Sheet
+      Navigator.pop(context);
+    }).catchError((error) {
+      print('Error submitting report: $error');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get User Position

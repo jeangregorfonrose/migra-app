@@ -21,4 +21,20 @@ class ReportApi {
       throw Exception('Failed to load reports');
     }
   }
+
+  // Add code to create a new report
+  Future<Report> createReport(Report report) async {
+    final response = await _client.post(
+      '/report',
+      body: jsonEncode(report.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      final responseJson = jsonDecode(response.body);
+      final reportJson = responseJson['data'];
+      return Report.fromJson(reportJson);
+    } else {
+      throw Exception('Failed to create report');
+    }
+  }
 }

@@ -5,14 +5,14 @@ class Report {
   final String description;
   final DateTime timestamp;
   final Location location;
-  final int version;
+  int version;
 
   Report({
     required this.id,
     required this.description,
     required this.timestamp,
     required this.location,
-    required this.version,
+    this.version = 0,
   });
 
   factory Report.fromJson(Map<String, dynamic> json) {
@@ -27,11 +27,9 @@ class Report {
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
       'description': description,
       'timestamp': timestamp.toIso8601String(),
       'location': location.toJson(),
-      '__v': version,
     };
   }
 }
