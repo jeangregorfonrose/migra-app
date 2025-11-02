@@ -200,7 +200,7 @@ class _MapScreenState extends State<MapScreen>
     final appData = Provider.of<AppData>(context, listen: false);
     Position userPosition = appData.getUserPosition;
 
-    await _map!.setCamera(
+    await _map!.flyTo(
       mbx.CameraOptions(
         center: mbx.Point(
           coordinates: mbx.Position(
@@ -210,6 +210,7 @@ class _MapScreenState extends State<MapScreen>
         ),
         zoom: 12.0,
       ),
+      mbx.MapAnimationOptions(duration: 1000),
     );
   }
 
