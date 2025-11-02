@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:http/http.dart';
@@ -26,7 +25,7 @@ class _MapScreenState extends State<MapScreen>
 
   // list of reports to display on map
   // List<Report> _reports = [];
-  late Future<List<Report>> _reportsFuture;
+  List<Report> _reports = [];
 
   // ---------- Map setup ----------
   late String accessToken; // access token for the mapbox account, will be set in initState from env
@@ -43,9 +42,14 @@ class _MapScreenState extends State<MapScreen>
     super.initState();
 
     // fetch reports from backend
-    _reportsFuture = _reportApi.fetchReports();
-    _reportsFuture.then((reports) {
-      print(reports);
+    Future<List<Report>> reportsFuture = _reportApi.fetchReports();
+
+    // set reports when fetched
+    reportsFuture.then((reports) {
+      setState(() {
+        _reports = reports;
+      });
+      _addReportsSource();
     }).catchError((error) {
       print('Error fetching reports: $error');
     });
@@ -118,8 +122,6 @@ class _MapScreenState extends State<MapScreen>
   }
 
   void _openSubmitReportSheet(mbx.Position position) {
-    String type = 'sighting'; // default type
-    double severity = 2;
     final descriptionCtrl = TextEditingController();
 
     showModalBottomSheet(
@@ -229,12 +231,98 @@ class _MapScreenState extends State<MapScreen>
     // Call the API to submit the report
     _reportApi.createReport(newReport).then((report) {
       print('Report submitted: $report');
+      _addNewReportToSource(report);
 
       // Closing Bottom Sheet
       Navigator.pop(context);
+
+      // Show confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Report submitted'),
+          backgroundColor: Colors.green,
+        ),
+      );
     }).catchError((error) {
       print('Error submitting report: $error');
     });
+  }
+
+  void _addReportsSource() async {
+    if (_map == null) return;
+    
+    final style = _map!.style;
+    
+    // Build updated FeatureCollection with all reports
+    final features = _reports.map((r) {
+      return {
+        "type": "Feature",
+        "properties": {
+          "id": r.id,
+          "description": r.description,
+          "timestamp": r.timestamp.toIso8601String(),
+        },
+        "geometry": r.location.toJson()
+      };
+    }).toList();
+
+    final collection = {
+      "type": "FeatureCollection",
+      "features": features,
+    };
+
+    // Update the existing source with new data
+    try {
+        // Create source and add to map style
+        await style.addSource(mbx.GeoJsonSource(id: "reports_source", data: jsonEncode(collection)));
+
+        final reportsLayer = mbx.CircleLayer(id: 'reports_layer', sourceId: 'reports_source')
+        ..filter = [
+          "all",
+        ]
+        ..circleColor = 0xFFE53935  // Red
+        ..circleRadius = 8.0
+        ..circleOpacity = 0.9
+        ..circleStrokeColor = 0xFF111111  // Black border
+        ..circleStrokeWidth = 1.0;
+
+        await style.addLayer(reportsLayer);
+      print('✅ Reports source refreshed with ${_reports.length} reports');
+    } catch (e) {
+      print('❌ Error refreshing source: $e');
+    }
+  }
+  
+  void _addNewReportToSource(Report report) async {
+    if (_map == null) return;
+
+    _reports.add(report); // add to local list
+
+    // Get reports source
+    final style = _map!.style;
+    final reportsSource = await style.getSource('reports_source') as mbx.GeoJsonSource;
+
+    // Build updated FeatureCollection with all reports
+    final features = _reports.map((r) {
+      return {
+        "type": "Feature",
+        "properties": {
+          "id": r.id,
+          "description": r.description,
+          "timestamp": r.timestamp.toIso8601String(),
+        },
+        "geometry": r.location.toJson()
+      };
+    }).toList();
+
+    final collection = {
+      "type": "FeatureCollection",
+      "features": features,
+    };
+
+    await reportsSource.updateGeoJSON(jsonEncode(collection));
+
+    print('✅ New report added to source: ${report.id}');
   }
 
   @override
@@ -259,10 +347,7 @@ class _MapScreenState extends State<MapScreen>
             onCameraChangeListener: _onCameraChange,
             onMapCreated: (mbx.MapboxMap mapboxMap) async {
               _map = mapboxMap;
-
-              // Wait for style to load
-              await Future.delayed(Duration(milliseconds: 500));
-            }
+            },
           ),
 
           // Fixed pin overlay in center of screen
