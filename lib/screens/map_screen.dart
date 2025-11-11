@@ -349,7 +349,6 @@ class _MapScreenState extends State<MapScreen>
         mbx.HeatmapLayer(id: 'reports_heatmap', sourceId: 'reports_source')
           // Show all features
           ..filter = ["all"]
-
           // Intensity: How strong the heat effect is
           ..heatmapIntensity = 1.0
           // Radius: Size of each heat point in pixels
@@ -362,7 +361,6 @@ class _MapScreenState extends State<MapScreen>
           ]
           // Weight: How much each point contributes
           ..heatmapWeight = 0.6
-          
           // Opacity: Fade out as you zoom in
           ..heatmapOpacityExpression = [
             "interpolate",
@@ -371,15 +369,15 @@ class _MapScreenState extends State<MapScreen>
             10, 1.0, // Zoomed out: fully visible
             14, 0.0, // Zoomed in: invisible
           ];
-          // Color: Density gradient
-          // ..heatmapColorExpression = [
-          //   "interpolate",
-          //   ["linear"],
-          //   ["heatmap-density"],
-          //   0.0, "rgb(33,66,235)", // No density: transparent
-          //   0.5, "rgb(235,147,33)", // Medium density: yellow
-          //   1.0, "rgb(235,33,33)", // High density: red
-          // ];
+    // Color: Density gradient
+    // ..heatmapColorExpression = [
+    //   "interpolate",
+    //   ["linear"],
+    //   ["heatmap-density"],
+    //   0.0, "rgb(33,66,235)", // No density: transparent
+    //   0.5, "rgb(235,147,33)", // Medium density: yellow
+    //   1.0, "rgb(235,33,33)", // High density: red
+    // ];
 
     await style.addLayer(heatmapLayer);
   }
@@ -406,12 +404,18 @@ class _MapScreenState extends State<MapScreen>
             onCameraChangeListener: _onCameraChange,
             onMapCreated: (mbx.MapboxMap mapboxMap) async {
               _map = mapboxMap;
-              // _map?.location.updateSettings(
-              //   mbx.LocationComponentSettings(
-              //     enabled: true,
-              //     pulsingEnabled: true,
-              //     showAccuracyRing: true
-              //   ));
+              _map?.location.updateSettings(
+                mbx.LocationComponentSettings(
+                  enabled: true,
+                  pulsingEnabled: true,
+                  locationPuck: mbx.LocationPuck(
+                    locationPuck3D: mbx.LocationPuck3D(
+                      modelUri:
+                          "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Embedded/Duck.gltf",
+                    ),
+                  ),
+                ),
+              );
             },
           ),
 
