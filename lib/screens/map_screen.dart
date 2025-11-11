@@ -28,9 +28,9 @@ class _MapScreenState extends State<MapScreen>
   List<Report> _reports = [];
 
   // ---------- Map setup ----------
-  late String accessToken; // access token for the mapbox account, will be set in initState from env
-  static const String _styleUri = 'mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID';
-  
+  late String
+  accessToken; // access token for the mapbox account, will be set in initState from env
+
   mbx.MapboxMap? _map;
 
   // ---------- Report Submission State ----------
@@ -45,14 +45,16 @@ class _MapScreenState extends State<MapScreen>
     Future<List<Report>> reportsFuture = _reportApi.fetchReports();
 
     // set reports when fetched
-    reportsFuture.then((reports) {
-      setState(() {
-        _reports = reports;
-      });
-      _addReportsSource();
-    }).catchError((error) {
-      print('Error fetching reports: $error');
-    });
+    reportsFuture
+        .then((reports) {
+          setState(() {
+            _reports = reports;
+          });
+          _addReportsSource();
+        })
+        .catchError((error) {
+          print('Error fetching reports: $error');
+        });
 
     // ---------- Mapbox setup ----------
     accessToken = const String.fromEnvironment("ACCESS_TOKEN");
@@ -67,7 +69,7 @@ class _MapScreenState extends State<MapScreen>
 
   // ---------- Map Report Pin Selection ----------
   Future<void> _startPlacingReportPin() async {
-    if(_map == null) return;
+    if (_map == null) return;
 
     setState(() {
       _isPlacingMarker = true;
@@ -77,30 +79,38 @@ class _MapScreenState extends State<MapScreen>
     final camera = await _map!.getCameraState();
     final center = camera.center;
     _draftCoord = mbx.Position(center.coordinates.lng, center.coordinates.lat);
-    print('Initial position: ${center.coordinates.lat}, ${center.coordinates.lng}');
+    print(
+      'Initial position: ${center.coordinates.lat}, ${center.coordinates.lng}',
+    );
   }
 
   // Update coordinates as map moves
   void _onCameraChange(mbx.CameraChangedEventData data) {
-    if(_isPlacingMarker && _map != null) {
-        _map!.getCameraState().then((camera) {
-        final center = camera.center;
-        setState(() {
-          _draftCoord = mbx.Position(center.coordinates.lng, center.coordinates.lat);
-        });
-        // print('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
-      }).catchError((e) {
-        // print('Failed to get camera state: $e');
-      });
+    if (_isPlacingMarker && _map != null) {
+      _map!
+          .getCameraState()
+          .then((camera) {
+            final center = camera.center;
+            setState(() {
+              _draftCoord = mbx.Position(
+                center.coordinates.lng,
+                center.coordinates.lat,
+              );
+            });
+            // print('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
+          })
+          .catchError((e) {
+            // print('Failed to get camera state: $e');
+          });
     }
   }
 
   // Confirm placement of report pin
   void _confirmLocationAndOpentSheet() {
-    if(_draftCoord == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: No location selected'))
-      );
+    if (_draftCoord == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: No location selected')));
       return;
     }
 
@@ -147,7 +157,7 @@ class _MapScreenState extends State<MapScreen>
                   // Title
                   const Text(
                     'Submit Report',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
                   // Spacing
@@ -156,7 +166,7 @@ class _MapScreenState extends State<MapScreen>
                   // Location
                   Text(
                     'Location: (${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})',
-                    style: const TextStyle(fontSize: 14, color: Colors.grey)
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
 
                   // Description of report
@@ -183,21 +193,21 @@ class _MapScreenState extends State<MapScreen>
                       label: const Text('Submit Report'),
                       icon: const Icon(Icons.send),
                       onPressed: () => _submitReport(descriptionCtrl.text),
-                    )
+                    ),
                   ),
-                  
+
                   const SizedBox(height: 20),
                 ],
               );
-            }
-          )
+            },
+          ),
         );
       },
     );
   }
 
   void _focusOnUserLocation() async {
-    if(_map == null) return;
+    if (_map == null) return;
 
     final appData = Provider.of<AppData>(context, listen: false);
     Position userPosition = appData.getUserPosition;
@@ -220,79 +230,86 @@ class _MapScreenState extends State<MapScreen>
     // Create a new report
     Report newReport = Report(
       id: '',
-      location: Location(type: "Point", coordinates: [
-        _draftCoord!.lng.toDouble(),
-        _draftCoord!.lat.toDouble()
-      ]),
+      location: Location(
+        type: "Point",
+        coordinates: [_draftCoord!.lng.toDouble(), _draftCoord!.lat.toDouble()],
+      ),
       description: description,
-      timestamp: DateTime.now()
+      timestamp: DateTime.now(),
     );
 
     // Call the API to submit the report
-    _reportApi.createReport(newReport).then((report) {
-      print('Report submitted: $report');
-      _addNewReportToSource(report);
+    _reportApi
+        .createReport(newReport)
+        .then((report) {
+          print('Report submitted: $report');
+          _addNewReportToSource(report);
 
-      // Closing Bottom Sheet
-      Navigator.pop(context);
+          // Closing Bottom Sheet
+          Navigator.pop(context);
 
-      // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Report submitted'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }).catchError((error) {
-      print('Error submitting report: $error');
-    });
+          // Show confirmation
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Report submitted'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        })
+        .catchError((error) {
+          print('Error submitting report: $error');
+        });
   }
 
   void _addReportsSource() async {
     if (_map == null) return;
-    
-    final style = _map!.style;
-    
-    // Build updated FeatureCollection with all reports
-    final features = _reports.map((r) {
-      return {
-        "type": "Feature",
-        "properties": {
-          "id": r.id,
-          "description": r.description,
-          "timestamp": r.timestamp.toIso8601String(),
-        },
-        "geometry": r.location.toJson()
-      };
-    }).toList();
 
-    final collection = {
-      "type": "FeatureCollection",
-      "features": features,
-    };
+    final style = _map!.style;
+
+    // Build updated FeatureCollection with all reports
+    final features =
+        _reports.map((r) {
+          return {
+            "type": "Feature",
+            "properties": {
+              "id": r.id,
+              "description": r.description,
+              "timestamp": r.timestamp.toIso8601String(),
+            },
+            "geometry": r.location.toJson(),
+          };
+        }).toList();
+
+    final collection = {"type": "FeatureCollection", "features": features};
 
     // Update the existing source with new data
     try {
-        // Create source and add to map style
-        await style.addSource(mbx.GeoJsonSource(id: "reports_source", data: jsonEncode(collection)));
+      // Create source and add to map style
+      await style.addSource(
+        mbx.GeoJsonSource(id: "reports_source", data: jsonEncode(collection)),
+      );
 
-        final reportsLayer = mbx.CircleLayer(id: 'reports_layer', sourceId: 'reports_source')
-        ..filter = [
-          "all",
-        ]
-        ..circleColor = 0xFFE53935  // Red
-        ..circleRadius = 8.0
-        ..circleOpacity = 0.9
-        ..circleStrokeColor = 0xFF111111  // Black border
-        ..circleStrokeWidth = 1.0;
+      final reportsLayer =
+          mbx.CircleLayer(id: 'reports_layer', sourceId: 'reports_source')
+            ..filter = ["all"]
+            ..circleColor =
+                0xFFE53935 // Red
+            ..circleRadius = 8.0
+            ..circleOpacity = 0.9
+            ..circleStrokeColor =
+                0xFF111111 // Black border
+            ..circleStrokeWidth = 1.0;
 
-        await style.addLayer(reportsLayer);
+      await style.addLayer(reportsLayer);
+
+      // Add heatmap layer
+      _addHeatmapLayer();
       print('✅ Reports source refreshed with ${_reports.length} reports');
     } catch (e) {
       print('❌ Error refreshing source: $e');
     }
   }
-  
+
   void _addNewReportToSource(Report report) async {
     if (_map == null) return;
 
@@ -300,29 +317,71 @@ class _MapScreenState extends State<MapScreen>
 
     // Get reports source
     final style = _map!.style;
-    final reportsSource = await style.getSource('reports_source') as mbx.GeoJsonSource;
+    final reportsSource =
+        await style.getSource('reports_source') as mbx.GeoJsonSource;
 
     // Build updated FeatureCollection with all reports
-    final features = _reports.map((r) {
-      return {
-        "type": "Feature",
-        "properties": {
-          "id": r.id,
-          "description": r.description,
-          "timestamp": r.timestamp.toIso8601String(),
-        },
-        "geometry": r.location.toJson()
-      };
-    }).toList();
+    final features =
+        _reports.map((r) {
+          return {
+            "type": "Feature",
+            "properties": {
+              "id": r.id,
+              "description": r.description,
+              "timestamp": r.timestamp.toIso8601String(),
+            },
+            "geometry": r.location.toJson(),
+          };
+        }).toList();
 
-    final collection = {
-      "type": "FeatureCollection",
-      "features": features,
-    };
+    final collection = {"type": "FeatureCollection", "features": features};
 
     await reportsSource.updateGeoJSON(jsonEncode(collection));
 
     print('✅ New report added to source: ${report.id}');
+  }
+
+  void _addHeatmapLayer() async {
+    final style = _map!.style;
+
+    // Create heatmap layer using the same 'reports' source
+    final heatmapLayer =
+        mbx.HeatmapLayer(id: 'reports_heatmap', sourceId: 'reports_source')
+          // Show all features
+          ..filter = ["all"]
+
+          // Intensity: How strong the heat effect is
+          ..heatmapIntensity = 1.0
+          // Radius: Size of each heat point in pixels
+          ..heatmapRadiusExpression = [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            0, 10, // Zoomed out: small radius
+            10, 50, // Medium zoom: medium radius
+          ]
+          // Weight: How much each point contributes
+          ..heatmapWeight = 0.6
+          
+          // Opacity: Fade out as you zoom in
+          ..heatmapOpacityExpression = [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10, 1.0, // Zoomed out: fully visible
+            14, 0.0, // Zoomed in: invisible
+          ];
+          // Color: Density gradient
+          // ..heatmapColorExpression = [
+          //   "interpolate",
+          //   ["linear"],
+          //   ["heatmap-density"],
+          //   0.0, "rgb(33,66,235)", // No density: transparent
+          //   0.5, "rgb(235,147,33)", // Medium density: yellow
+          //   1.0, "rgb(235,33,33)", // High density: red
+          // ];
+
+    await style.addLayer(heatmapLayer);
   }
 
   @override
@@ -347,6 +406,12 @@ class _MapScreenState extends State<MapScreen>
             onCameraChangeListener: _onCameraChange,
             onMapCreated: (mbx.MapboxMap mapboxMap) async {
               _map = mapboxMap;
+              // _map?.location.updateSettings(
+              //   mbx.LocationComponentSettings(
+              //     enabled: true,
+              //     pulsingEnabled: true,
+              //     showAccuracyRing: true
+              //   ));
             },
           ),
 
@@ -419,17 +484,24 @@ class _MapScreenState extends State<MapScreen>
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _isPlacingMarker ? Container() : FloatingActionButton(
-            heroTag: 'fab_report',
-            onPressed: _startPlacingReportPin,
-            child: const Icon(Icons.add_location_alt, color: AppColors.white,),
-          ),
+          _isPlacingMarker
+              ? Container()
+              : FloatingActionButton(
+                heroTag: 'fab_report',
+                onPressed: _startPlacingReportPin,
+                child: const Icon(
+                  Icons.add_location_alt,
+                  color: AppColors.white,
+                ),
+              ),
           const SizedBox(height: 12),
-          _isPlacingMarker ? Container() :FloatingActionButton(
-            heroTag: 'fab_focus',
-            onPressed: _focusOnUserLocation,
-            child: const Icon(Icons.adjust_rounded, color: AppColors.white,),
-          ),
+          _isPlacingMarker
+              ? Container()
+              : FloatingActionButton(
+                heroTag: 'fab_focus',
+                onPressed: _focusOnUserLocation,
+                child: const Icon(Icons.adjust_rounded, color: AppColors.white),
+              ),
         ],
       ),
     );

@@ -11,8 +11,8 @@ class ReportMapScreen extends StatefulWidget {
 
 class _ReportMapScreenState extends State<ReportMapScreen> {
   GoogleMapController? _mapController;
-  Set<Marker> _markers = {};
-  LatLng _initialPosition = LatLng(
+  final Set<Marker> _markers = {};
+  final LatLng _initialPosition = LatLng(
     18.488829386620246,
     -69.89349417670161
   ); // Default to SF
