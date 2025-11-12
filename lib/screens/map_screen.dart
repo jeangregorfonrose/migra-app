@@ -234,7 +234,9 @@ class _MapScreenState extends State<MapScreen>
         type: "Point",
         coordinates: [_draftCoord!.lng.toDouble(), _draftCoord!.lat.toDouble()],
       ),
-      description: description,
+      description: description.isEmpty
+          ? ''
+          : description,
       timestamp: DateTime.now(),
     );
 
@@ -258,6 +260,16 @@ class _MapScreenState extends State<MapScreen>
         })
         .catchError((error) {
           print('Error submitting report: $error');
+          // Closing Bottom Sheet
+          Navigator.pop(context);
+
+          // Show confirmation
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to create report'),
+              backgroundColor: Colors.red,
+            ),
+          );
         });
   }
 
