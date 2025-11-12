@@ -12,7 +12,6 @@ class AppData extends ChangeNotifier {
   // Setters
   Future<void> updateUser(User newUser) async {
     user = newUser;
-    print("User Updated");
     // Get a fresh ID token (JWT)
     // final idToken = await user?.getIdToken(true);
     // print(idToken);

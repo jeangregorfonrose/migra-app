@@ -379,7 +379,7 @@ class _MapScreenState extends State<MapScreen>
     //   1.0, "rgb(235,33,33)", // High density: red
     // ];
 
-    await style.addLayerAt(heatmapLayer, mbx.LayerPosition(below: 'mapbox-location-indicator-layer'));
+    await style.addLayerAt(heatmapLayer, mbx.LayerPosition(above: "reports_layer"));
   }
 
   @override
