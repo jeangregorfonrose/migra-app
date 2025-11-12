@@ -379,7 +379,7 @@ class _MapScreenState extends State<MapScreen>
     //   1.0, "rgb(235,33,33)", // High density: red
     // ];
 
-    await style.addLayer(heatmapLayer);
+    await style.addLayerAt(heatmapLayer, mbx.LayerPosition(below: 'mapbox-location-indicator-layer'));
   }
 
   @override
@@ -402,20 +402,23 @@ class _MapScreenState extends State<MapScreen>
               zoom: 12.0,
             ),
             onCameraChangeListener: _onCameraChange,
+            onStyleLoadedListener: (styleLoadedEventData) async {
+              // Enable location puck with 2D default style
+              try {
+                await _map?.location.updateSettings(
+                  mbx.LocationComponentSettings(
+                    enabled: true,
+                    pulsingEnabled: true, // Pulsing blue circle
+                    puckBearingEnabled: true, // Show direction arrow
+                  ),
+                );
+                print('✅ Location puck enabled');
+              } catch (e) {
+                print('❌ Error enabling location: $e');
+              }
+            },
             onMapCreated: (mbx.MapboxMap mapboxMap) async {
               _map = mapboxMap;
-              _map?.location.updateSettings(
-                mbx.LocationComponentSettings(
-                  enabled: true,
-                  pulsingEnabled: true,
-                  locationPuck: mbx.LocationPuck(
-                    locationPuck3D: mbx.LocationPuck3D(
-                      modelUri:
-                          "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Embedded/Duck.gltf",
-                    ),
-                  ),
-                ),
-              );
             },
           ),
 
