@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:migra_app/core/utils/app_logger.dart';
 
 class AppData extends ChangeNotifier {
   //App-wide state variables and methods
@@ -21,7 +22,7 @@ class AppData extends ChangeNotifier {
 
   void updateUserPosition(Position newPosition, bool notify) {
     userPosition = newPosition;
-    print('Position Updated: $newPosition');
+    AppLogger.map('Position Updated: $newPosition');
     if (notify) {
       notifyListeners();
     }

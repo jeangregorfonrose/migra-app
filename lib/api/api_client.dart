@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/core/utils/constants.dart';
 
 class ApiClient {
@@ -24,9 +25,9 @@ class ApiClient {
     // get auth token if user is logged in
     try {
        idToken = await user?.getIdToken();
-      print('Fresh token: $idToken');
+      AppLogger.auth('Fresh token: $idToken');
     } catch (e) {
-      print('Error fetching token: $e');
+      AppLogger.error('Error fetching token: $e');
     }
 
     return {
