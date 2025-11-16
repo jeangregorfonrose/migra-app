@@ -151,10 +151,21 @@ class _MapScreenState extends State<MapScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
-                  const Text(
-                    'Submit Report',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.event_note),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const Text(
+                        'Submit Report',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    ],
                   ),
 
                   // Spacing
