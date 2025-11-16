@@ -8,6 +8,7 @@ import 'package:migra_app/api/report_api.dart';
 import 'package:migra_app/core/models/location_model.dart';
 import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
+import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,6 @@ class _MapScreenState extends State<MapScreen>
   final ReportApi _reportApi = ReportApi(ApiClient(Client()));
 
   // list of reports to display on map
-  // List<Report> _reports = [];
   List<Report> _reports = [];
 
   // ---------- Map setup ----------
@@ -53,7 +53,7 @@ class _MapScreenState extends State<MapScreen>
           _addReportsSource();
         })
         .catchError((error) {
-          print('Error fetching reports: $error');
+          AppLogger.error('Error fetching reports', error: error);
         });
 
     // ---------- Mapbox setup ----------
@@ -79,9 +79,6 @@ class _MapScreenState extends State<MapScreen>
     final camera = await _map!.getCameraState();
     final center = camera.center;
     _draftCoord = mbx.Position(center.coordinates.lng, center.coordinates.lat);
-    print(
-      'Initial position: ${center.coordinates.lat}, ${center.coordinates.lng}',
-    );
   }
 
   // Update coordinates as map moves
@@ -97,10 +94,10 @@ class _MapScreenState extends State<MapScreen>
                 center.coordinates.lat,
               );
             });
-            // print('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
+            AppLogger.map('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
           })
           .catchError((e) {
-            // print('Failed to get camera state: $e');
+            AppLogger.error('Failed to get camera state', error: e);
           });
     }
   }
@@ -114,7 +111,7 @@ class _MapScreenState extends State<MapScreen>
       return;
     }
 
-    print('Report pin placed at: ${_draftCoord!.lat}, ${_draftCoord!.lng}');
+    AppLogger.map('Report pin placed at: ${_draftCoord!.lat}, ${_draftCoord!.lng}');
 
     setState(() {
       _isPlacingMarker = false;
@@ -244,7 +241,7 @@ class _MapScreenState extends State<MapScreen>
     _reportApi
         .createReport(newReport)
         .then((report) {
-          print('Report submitted: $report');
+          AppLogger.report('Report submitted: $report');
           _addNewReportToSource(report);
 
           // Closing Bottom Sheet
@@ -259,7 +256,7 @@ class _MapScreenState extends State<MapScreen>
           );
         })
         .catchError((error) {
-          print('Error submitting report: $error');
+          AppLogger.error('Error submitting report', error: error);
           // Closing Bottom Sheet
           Navigator.pop(context);
 
@@ -316,9 +313,9 @@ class _MapScreenState extends State<MapScreen>
 
       // Add heatmap layer
       _addHeatmapLayer();
-      print('✅ Reports source refreshed with ${_reports.length} reports');
+      AppLogger.map('✅ Reports source refreshed with ${_reports.length} reports');
     } catch (e) {
-      print('❌ Error refreshing source: $e');
+      AppLogger.error('❌ Error refreshing source', error: e);
     }
   }
 
@@ -350,7 +347,7 @@ class _MapScreenState extends State<MapScreen>
 
     await reportsSource.updateGeoJSON(jsonEncode(collection));
 
-    print('✅ New report added to source: ${report.id}');
+    AppLogger.map('✅ New report added to source: ${report.id}');
   }
 
   void _addHeatmapLayer() async {
@@ -424,9 +421,9 @@ class _MapScreenState extends State<MapScreen>
                     puckBearingEnabled: true, // Show direction arrow
                   ),
                 );
-                print('✅ Location puck enabled');
+                AppLogger.map('✅ Location puck enabled');
               } catch (e) {
-                print('❌ Error enabling location: $e');
+                AppLogger.error('❌ Error enabling location', error: e);
               }
             },
             onMapCreated: (mbx.MapboxMap mapboxMap) async {
