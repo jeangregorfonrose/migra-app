@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:migra_app/core/router.dart';
@@ -12,11 +14,23 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // IMPORTANT: pass the platform-specific options
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Crashlytics setup
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+  
+  runApp(
+    ChangeNotifierProvider(create: (_) => AppData(), child: const MyApp()),
   );
-  runApp(ChangeNotifierProvider(create: (_) => AppData(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -52,12 +66,15 @@ class _AuthGateState extends State<AuthGate> {
     _ensureSignedIn();
 
     // Subscribe to auth changes OUTSIDE build
-    _sub = FirebaseAuth.instance.authStateChanges().listen((user) {
-      context.read<AppData>().updateUser(user!); // safe here
-      if (mounted && !_authReady) setState(() => _authReady = true);
-    }, onError: (e) {
-      if (mounted && !_authReady) setState(() => _authReady = true);
-    });
+    _sub = FirebaseAuth.instance.authStateChanges().listen(
+      (user) {
+        context.read<AppData>().updateUser(user!); // safe here
+        if (mounted && !_authReady) setState(() => _authReady = true);
+      },
+      onError: (e) {
+        if (mounted && !_authReady) setState(() => _authReady = true);
+      },
+    );
   }
 
   Future<void> _ensureSignedIn() async {
@@ -66,7 +83,10 @@ class _AuthGateState extends State<AuthGate> {
       // we’ll still wait for the stream event to flip _authReady
       return;
     }
-    setState(() { _signingIn = true; _error = null; });
+    setState(() {
+      _signingIn = true;
+      _error = null;
+    });
 
     try {
       await auth.signInAnonymously();
@@ -100,11 +120,17 @@ class _AuthGateState extends State<AuthGate> {
               children: [
                 const Icon(Icons.error_outline, size: 48),
                 const SizedBox(height: 12),
-                const Text('Sign-in failed', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                const Text(
+                  'Sign-in failed',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 8),
                 Text(_error!, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
-                ElevatedButton(onPressed: _ensureSignedIn, child: const Text('Try again')),
+                ElevatedButton(
+                  onPressed: _ensureSignedIn,
+                  child: const Text('Try again'),
+                ),
               ],
             ),
           ),
@@ -115,4 +141,3 @@ class _AuthGateState extends State<AuthGate> {
     return const HomeScreen();
   }
 }
-

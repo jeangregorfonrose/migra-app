@@ -46,6 +46,7 @@ app.*.map.json
 
 # debug files
 android/app/.cxx/Debug
+android/app/.cxx/
 
 # API Keys
 ios/Runner/GoogleService-Info.plist
