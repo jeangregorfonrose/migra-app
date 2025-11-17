@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.1
   firebase_messaging: ^16.0.0
@@ -38,11 +41,13 @@ dependencies:
   geolocator: ^14.0.2
   http: ^1.3.0
   provider: ^6.1.4
+  shared_preferences: ^2.2.2
   mapbox_maps_flutter: ^2.0.0
   go_router: ^14.2.0
   flutter_launcher_icons: ^0.14.4
   logger: ^2.0.2
   firebase_crashlytics: ^5.0.0
+  ht_localization: ^1.0.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -50,6 +55,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   geolocator_platform_interface: ^4.2.6
 
+dependency_overrides:
+  intl: ^0.20.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -66,7 +74,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -10,7 +10,9 @@ import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
+import 'package:migra_app/widgets/language_selector.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -94,7 +96,9 @@ class _MapScreenState extends State<MapScreen>
                 center.coordinates.lat,
               );
             });
-            AppLogger.map('Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}');
+            AppLogger.map(
+              'Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}',
+            );
           })
           .catchError((e) {
             AppLogger.error('Failed to get camera state', error: e);
@@ -111,7 +115,9 @@ class _MapScreenState extends State<MapScreen>
       return;
     }
 
-    AppLogger.map('Report pin placed at: ${_draftCoord!.lat}, ${_draftCoord!.lng}');
+    AppLogger.map(
+      'Report pin placed at: ${_draftCoord!.lat}, ${_draftCoord!.lng}',
+    );
 
     setState(() {
       _isPlacingMarker = false;
@@ -147,6 +153,9 @@ class _MapScreenState extends State<MapScreen>
           ),
           child: StatefulBuilder(
             builder: (context, setModalState) {
+              // Get Translations
+              final l10n = AppLocalizations.of(context)!;
+
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,17 +163,27 @@ class _MapScreenState extends State<MapScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.event_note),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        'Submit Report',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Transform.translate(
+                        offset: const Offset(
+                          -15,
+                          0,
+                        ), // Adjust x and y values as needed
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.event_note),
+                          onPressed: () => Navigator.pop(context),
                         ),
-                      )
+                      ),
+                      Transform.translate(
+                        offset: const Offset(-15, 0),
+                        child: Text(
+                          l10n.submitReport,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
 
@@ -173,20 +192,19 @@ class _MapScreenState extends State<MapScreen>
 
                   // Location
                   Text(
-                    'Location: (${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})',
+                    '${l10n.location}: (${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
 
                   // Description of report
-                  const Text("Note (optional)"),
+                  Text(l10n.whatHappened),
                   const SizedBox(height: 6),
                   TextField(
                     controller: descriptionCtrl,
                     maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText:
-                          "Brief details (e.g., uniforms, vehicles, time)",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: l10n.briefDetails,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
 
@@ -198,9 +216,9 @@ class _MapScreenState extends State<MapScreen>
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton.icon(
-                      label: const Text('Submit Report'),
+                      label: Text(l10n.submitReport),
                       icon: const Icon(Icons.send),
-                      onPressed: () => _submitReport(descriptionCtrl.text),
+                      onPressed: () => _submitReport(context, descriptionCtrl.text),
                     ),
                   ),
 
@@ -234,7 +252,10 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
-  void _submitReport(String description) {
+  void _submitReport(BuildContext context, String description) {
+    // get Translations
+    final l10n = AppLocalizations.of(context)!;
+
     // Create a new report
     Report newReport = Report(
       id: '',
@@ -242,9 +263,7 @@ class _MapScreenState extends State<MapScreen>
         type: "Point",
         coordinates: [_draftCoord!.lng.toDouble(), _draftCoord!.lat.toDouble()],
       ),
-      description: description.isEmpty
-          ? ''
-          : description,
+      description: description.isEmpty ? '' : description,
       timestamp: DateTime.now(),
     );
 
@@ -260,8 +279,9 @@ class _MapScreenState extends State<MapScreen>
 
           // Show confirmation
           ScaffoldMessenger.of(context).showSnackBar(
+            // get Translations
             SnackBar(
-              content: Text('Report submitted'),
+              content: Text(l10n.reportSubmitted),
               backgroundColor: Colors.green,
             ),
           );
@@ -274,7 +294,7 @@ class _MapScreenState extends State<MapScreen>
           // Show confirmation
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to create report'),
+              content: Text(l10n.failedReportSubmission),
               backgroundColor: Colors.red,
             ),
           );
@@ -324,7 +344,9 @@ class _MapScreenState extends State<MapScreen>
 
       // Add heatmap layer
       _addHeatmapLayer();
-      AppLogger.map('✅ Reports source refreshed with ${_reports.length} reports');
+      AppLogger.map(
+        '✅ Reports source refreshed with ${_reports.length} reports',
+      );
     } catch (e) {
       AppLogger.error('❌ Error refreshing source', error: e);
     }
@@ -399,7 +421,10 @@ class _MapScreenState extends State<MapScreen>
     //   1.0, "rgb(235,33,33)", // High density: red
     // ];
 
-    await style.addLayerAt(heatmapLayer, mbx.LayerPosition(above: "reports_layer"));
+    await style.addLayerAt(
+      heatmapLayer,
+      mbx.LayerPosition(above: "reports_layer"),
+    );
   }
 
   @override
@@ -407,6 +432,10 @@ class _MapScreenState extends State<MapScreen>
     // Get User Position
     final appData = Provider.of<AppData>(context, listen: false);
     Position userPosition = appData.getUserPosition;
+
+    // Get Translations
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -441,7 +470,22 @@ class _MapScreenState extends State<MapScreen>
               _map = mapboxMap;
             },
           ),
-
+          // Change language selector
+          if (!_isPlacingMarker)
+            Positioned(
+              top: 40,
+              right: 16,
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: LanguageSelector(),
+                ),
+              ),
+            ),
           // Fixed pin overlay in center of screen
           if (_isPlacingMarker)
             Center(
@@ -466,7 +510,7 @@ class _MapScreenState extends State<MapScreen>
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Text(
-                    'Move the map to position the pin',
+                    l10n.moveMapToPosition,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -490,7 +534,7 @@ class _MapScreenState extends State<MapScreen>
                     heroTag: 'cancel',
                     onPressed: _cancelPlacement,
                     icon: Icon(Icons.close),
-                    label: Text('Cancel'),
+                    label: Text(l10n.cancel),
                     backgroundColor: AppColors.cancelButtonBackground,
                   ),
                   SizedBox(width: 16),
@@ -498,7 +542,7 @@ class _MapScreenState extends State<MapScreen>
                     heroTag: 'confirm',
                     onPressed: _confirmLocationAndOpentSheet,
                     icon: Icon(Icons.check),
-                    label: Text('Confirm'),
+                    label: Text(l10n.confirm),
                     backgroundColor: AppColors.confirmButtonBackground,
                   ),
                 ],

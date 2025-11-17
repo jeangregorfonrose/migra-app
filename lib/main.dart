@@ -5,6 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ht_localization/ht_localization.dart';
 import 'package:migra_app/core/router.dart';
 import 'package:migra_app/core/themes/app_theme.dart';
 import 'package:migra_app/firebase_options.dart';
@@ -27,7 +30,7 @@ void main() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
-  
+
   runApp(
     ChangeNotifierProvider(create: (_) => AppData(), child: const MyApp()),
   );
@@ -38,11 +41,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appDataProvider = Provider.of<AppData>(context);
+
     return MaterialApp.router(
       title: 'Immigration Alert App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       routerConfig: appRouter,
+      locale: appDataProvider.locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        ...HTLocalizations.delegates,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en', 'US'), // English
+        Locale('es', ''), // Spanish
+        Locale('ht', 'HT'), // Haitian Creole
+        Locale('fr', '') // French
+      ],
     );
   }
 }
