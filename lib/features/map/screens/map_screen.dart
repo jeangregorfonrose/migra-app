@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,7 @@ import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
+import 'package:migra_app/shared/widgets/bouncing_pin.dart';
 import 'package:migra_app/shared/widgets/custom_toast.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -480,66 +482,81 @@ class _MapScreenState extends State<MapScreen>
               _map = mapboxMap;
             },
           ),
-          // Fixed pin overlay in center of screen
+          // Bouncing Pin
           if (_isPlacingMarker)
             Center(
-              child: Image.asset(
-                'assets/icons/pin_marker.png',
-                width: 48,
-                height: 48,
-              ),
+              child: BouncingPin(isPlacing: _isPlacingMarker),
             ),
 
-          // Instructions
+          // Location Selection Panel
           if (_isPlacingMarker)
             Positioned(
-              top: 50,
+              bottom: 0,
               left: 0,
               right: 0,
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Text(
-                    l10n.moveMapToPosition,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .scaffoldBackgroundColor
+                          .withOpacity(0.8),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.moveMapToPosition,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        if (_draftCoord != null)
+                          Text(
+                            '${_draftCoord!.lat.toStringAsFixed(5)}, ${_draftCoord!.lng.toStringAsFixed(5)}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            TextButton(
+                              onPressed: _cancelPlacement,
+                              child: Text(
+                                l10n.cancel,
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: _confirmLocationAndOpentSheet,
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 40, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                              ),
+                              child: Text(l10n.confirm),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ),
-
-          // Confirm/Cancel buttons when placing marker
-          if (_isPlacingMarker)
-            Positioned(
-              bottom: 50,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FloatingActionButton.extended(
-                    heroTag: 'cancel',
-                    onPressed: _cancelPlacement,
-                    icon: Icon(Icons.close),
-                    label: Text(l10n.cancel),
-                    backgroundColor: AppColors.cancelButtonBackground,
-                  ),
-                  SizedBox(width: 16),
-                  FloatingActionButton.extended(
-                    heroTag: 'confirm',
-                    onPressed: _confirmLocationAndOpentSheet,
-                    icon: Icon(Icons.check),
-                    label: Text(l10n.confirm),
-                    backgroundColor: AppColors.confirmButtonBackground,
-                  ),
-                ],
               ),
             ),
         ],
