@@ -35,7 +35,7 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.notifications),
             title: const Text('Notifications'),
-            trailing: aconst Icon(Icons.arrow_forward_ios),
+            trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               // Handle notification settings
             },
