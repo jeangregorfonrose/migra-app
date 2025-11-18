@@ -544,28 +544,23 @@ class _MapScreenState extends State<MapScreen>
             ),
         ],
       ),
-      floatingActionButton: Column(
+      floatingActionButton: _isPlacingMarker
+          ? null
+          : Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _isPlacingMarker
-              ? Container()
-              : FloatingActionButton(
+          FloatingActionButton.extended(
             heroTag: 'fab_report',
             onPressed: _startPlacingReportPin,
-            child: const Icon(
-              Icons.add_location_alt,
-              color: AppColors.white,
-            ),
+            label: Text("Create Report"),
+            icon: const Icon(Icons.add_location_alt),
           ),
-          const SizedBox(height: 12),
-          _isPlacingMarker
-              ? Container()
-              : FloatingActionButton(
+          const SizedBox(height: 16),
+          FloatingActionButton.extended(
             heroTag: 'fab_focus',
             onPressed: _focusOnUserLocation,
-            child: const Icon(Icons.adjust_rounded, color: AppColors.white),
+            label: Text("Focus"),
+            icon: const Icon(Icons.my_location),
           ),
         ],
       ),
