@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
@@ -309,8 +310,7 @@ class _MapScreenState extends State<MapScreen>
     final style = _map!.style;
 
     // Build updated FeatureCollection with all reports
-    final features =
-    _reports.map((r) {
+    final features = _reports.map((r) {
       return {
         "type": "Feature",
         "properties": {
@@ -331,16 +331,19 @@ class _MapScreenState extends State<MapScreen>
         mbx.GeoJsonSource(id: "reports_source", data: jsonEncode(collection)),
       );
 
-      final reportsLayer =
-      mbx.CircleLayer(id: 'reports_layer', sourceId: 'reports_source')
-        ..filter = ["all"]
-        ..circleColor =
-            0xFFE53935 // Red
-        ..circleRadius = 8.0
-        ..circleOpacity = 0.9
-        ..circleStrokeColor =
-            0xFF111111 // Black border
-        ..circleStrokeWidth = 1.0;
+      final ByteData bytes = await rootBundle.load('assets/icons/person_pin.svg');
+      final Uint8List list = bytes.buffer.asUint8List();
+      await style.addImage('person-pin', list);
+
+      final reportsLayer = mbx.SymbolLayer(
+        id: 'reports_layer',
+        sourceId: 'reports_source',
+      )
+        // ..iconImage = 'police-15' // Default Mapbox icon
+        ..iconImage = 'person-pin' // Custom icon
+        ..iconSize = 1.5
+        ..iconAllowOverlap = true
+        ..iconAnchor = mbx.IconAnchor.BOTTOM;
 
       await style.addLayer(reportsLayer);
 
