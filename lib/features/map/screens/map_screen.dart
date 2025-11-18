@@ -11,7 +11,6 @@ import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
-import 'package:migra_app/shared/widgets/language_selector.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -438,6 +437,7 @@ class _MapScreenState extends State<MapScreen>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text("Migra App"),
         actions: [
@@ -480,22 +480,6 @@ class _MapScreenState extends State<MapScreen>
               _map = mapboxMap;
             },
           ),
-          // Change language selector
-          if (!_isPlacingMarker)
-            Positioned(
-              top: 40,
-              right: 16,
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: LanguageSelector(),
-                ),
-              ),
-            ),
           // Fixed pin overlay in center of screen
           if (_isPlacingMarker)
             Center(
