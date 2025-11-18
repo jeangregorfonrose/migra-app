@@ -394,34 +394,44 @@ class _MapScreenState extends State<MapScreen>
       // Show all features
       ..filter = ["all"]
       // Intensity: How strong the heat effect is
-      ..heatmapIntensity = 1.0
+      ..heatmapIntensity = 1.2
       // Radius: Size of each heat point in pixels
       ..heatmapRadiusExpression = [
         "interpolate",
         ["linear"],
         ["zoom"],
-        0, 10, // Zoomed out: small radius
-        10, 50, // Medium zoom: medium radius
+        0, 2,
+        9, 20,
+        22, 100,
       ]
       // Weight: How much each point contributes
-      ..heatmapWeight = 0.6
+      ..heatmapWeight = 0.8
       // Opacity: Fade out as you zoom in
       ..heatmapOpacityExpression = [
         "interpolate",
         ["linear"],
         ["zoom"],
-        10, 1.0, // Zoomed out: fully visible
-        14, 0.0, // Zoomed in: invisible
+        7, 1.0,
+        15, 0.2,
+      ]
+      // Color: Density gradient
+      ..heatmapColorExpression = [
+        "interpolate",
+        ["linear"],
+        ["heatmap-density"],
+        0,
+        "rgba(33, 102, 172, 0)",
+        0.2,
+        "rgb(103, 169, 207)",
+        0.4,
+        "rgb(209, 229, 240)",
+        0.6,
+        "rgb(253, 219, 199)",
+        0.8,
+        "rgb(239, 138, 98)",
+        1,
+        "rgb(178, 24, 43)",
       ];
-    // Color: Density gradient
-    // ..heatmapColorExpression = [
-    //   "interpolate",
-    //   ["linear"],
-    //   ["heatmap-density"],
-    //   0.0, "rgb(33,66,235)", // No density: transparent
-    //   0.5, "rgb(235,147,33)", // Medium density: yellow
-    //   1.0, "rgb(235,33,33)", // High density: red
-    // ];
 
     await style.addLayerAt(
       heatmapLayer,
@@ -569,14 +579,14 @@ class _MapScreenState extends State<MapScreen>
           FloatingActionButton.extended(
             heroTag: 'fab_report',
             onPressed: _startPlacingReportPin,
-            label: Text("Create Report"),
+            label: Text(l10n.createReport),
             icon: const Icon(Icons.add_location_alt),
           ),
           const SizedBox(height: 16),
           FloatingActionButton.extended(
             heroTag: 'fab_focus',
             onPressed: _focusOnUserLocation,
-            label: Text("Focus"),
+            label: Text(l10n.focus),
             icon: const Icon(Icons.my_location),
           ),
         ],
