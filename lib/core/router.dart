@@ -1,7 +1,9 @@
 // lib/router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:migra_app/main.dart';
+import 'package:migra_app/features/auth/screens/auth_gate.dart';
+import 'package:migra_app/screens/chatgpt_report.dart';
+import 'package:migra_app/features/settings/screens/settings_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -11,11 +13,16 @@ final appRouter = GoRouter(
       name: 'home',
       pageBuilder: (context, state) => const MaterialPage(child: AuthGate()),
     ),
-    // GoRoute(
-    //   path: '/',
-    //   name: 'home',
-    //   pageBuilder: (ctx, state) => const MaterialPage(child: ReportMapV2Page()),
-    // ),
+    GoRoute(
+      path: '/map',
+      name: 'map',
+      pageBuilder: (ctx, state) => const MaterialPage(child: ReportMapV2Page()),
+    ),
+    GoRoute(
+      path: '/settings',
+      name: 'settings',
+      pageBuilder: (ctx, state) => const MaterialPage(child: SettingsScreen()),
+    ),
     // GoRoute(
     //   path: '/pick-location',
     //   name: 'pickLocation',
@@ -40,11 +47,6 @@ final appRouter = GoRouter(
     //     final id = state.pathParameters['id']!;
     //     return MaterialPage(child: ReportDetailsPage(reportId: id));
     //   },
-    // ),
-    // GoRoute(
-    //   path: '/settings',
-    //   name: 'settings',
-    //   pageBuilder: (ctx, state) => const MaterialPage(child: SettingsPage()),
     // ),
   ],
 );

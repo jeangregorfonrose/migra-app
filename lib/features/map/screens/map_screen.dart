@@ -10,7 +10,7 @@ import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
-import 'package:migra_app/widgets/language_selector.dart';
+import 'package:migra_app/shared/widgets/language_selector.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

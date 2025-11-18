@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:migra_app/core/utils/constants.dart';
 import 'package:migra_app/core/utils/location.dart';
 import 'package:migra_app/providers/app_data.dart';
-import 'package:migra_app/screens/map_screen.dart';
+import 'package:migra_app/features/map/screens/map_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
