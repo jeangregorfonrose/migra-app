@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import 'package:migra_app/api/api_client.dart';
@@ -49,14 +50,14 @@ class _MapScreenState extends State<MapScreen>
     // set reports when fetched
     reportsFuture
         .then((reports) {
-          setState(() {
-            _reports = reports;
-          });
-          _addReportsSource();
-        })
+      setState(() {
+        _reports = reports;
+      });
+      _addReportsSource();
+    })
         .catchError((error) {
-          AppLogger.error('Error fetching reports', error: error);
-        });
+      AppLogger.error('Error fetching reports', error: error);
+    });
 
     // ---------- Mapbox setup ----------
     accessToken = const String.fromEnvironment("ACCESS_TOKEN");
@@ -89,20 +90,20 @@ class _MapScreenState extends State<MapScreen>
       _map!
           .getCameraState()
           .then((camera) {
-            final center = camera.center;
-            setState(() {
-              _draftCoord = mbx.Position(
-                center.coordinates.lng,
-                center.coordinates.lat,
-              );
-            });
-            AppLogger.map(
-              'Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}',
-            );
-          })
+        final center = camera.center;
+        setState(() {
+          _draftCoord = mbx.Position(
+            center.coordinates.lng,
+            center.coordinates.lat,
+          );
+        });
+        AppLogger.map(
+          'Updated camera position: ${center.coordinates.lat}, ${center.coordinates.lng}',
+        );
+      })
           .catchError((e) {
-            AppLogger.error('Failed to get camera state', error: e);
-          });
+        AppLogger.error('Failed to get camera state', error: e);
+      });
     }
   }
 
@@ -271,34 +272,34 @@ class _MapScreenState extends State<MapScreen>
     _reportApi
         .createReport(newReport)
         .then((report) {
-          AppLogger.report('Report submitted: $report');
-          _addNewReportToSource(report);
+      AppLogger.report('Report submitted: $report');
+      _addNewReportToSource(report);
 
-          // Closing Bottom Sheet
-          Navigator.pop(context);
+      // Closing Bottom Sheet
+      Navigator.pop(context);
 
-          // Show confirmation
-          ScaffoldMessenger.of(context).showSnackBar(
-            // get Translations
-            SnackBar(
-              content: Text(l10n.reportSubmitted),
-              backgroundColor: Colors.green,
-            ),
-          );
-        })
+      // Show confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        // get Translations
+        SnackBar(
+          content: Text(l10n.reportSubmitted),
+          backgroundColor: Colors.green,
+        ),
+      );
+    })
         .catchError((error) {
-          AppLogger.error('Error submitting report', error: error);
-          // Closing Bottom Sheet
-          Navigator.pop(context);
+      AppLogger.error('Error submitting report', error: error);
+      // Closing Bottom Sheet
+      Navigator.pop(context);
 
-          // Show confirmation
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.failedReportSubmission),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
+      // Show confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.failedReportSubmission),
+          backgroundColor: Colors.red,
+        ),
+      );
+    });
   }
 
   void _addReportsSource() async {
@@ -309,16 +310,16 @@ class _MapScreenState extends State<MapScreen>
     // Build updated FeatureCollection with all reports
     final features =
         _reports.map((r) {
-          return {
-            "type": "Feature",
-            "properties": {
-              "id": r.id,
-              "description": r.description,
-              "timestamp": r.timestamp.toIso8601String(),
-            },
-            "geometry": r.location.toJson(),
-          };
-        }).toList();
+      return {
+        "type": "Feature",
+        "properties": {
+          "id": r.id,
+          "description": r.description,
+          "timestamp": r.timestamp.toIso8601String(),
+        },
+        "geometry": r.location.toJson(),
+      };
+    }).toList();
 
     final collection = {"type": "FeatureCollection", "features": features};
 
@@ -365,16 +366,16 @@ class _MapScreenState extends State<MapScreen>
     // Build updated FeatureCollection with all reports
     final features =
         _reports.map((r) {
-          return {
-            "type": "Feature",
-            "properties": {
-              "id": r.id,
-              "description": r.description,
-              "timestamp": r.timestamp.toIso8601String(),
-            },
-            "geometry": r.location.toJson(),
-          };
-        }).toList();
+      return {
+        "type": "Feature",
+        "properties": {
+          "id": r.id,
+          "description": r.description,
+          "timestamp": r.timestamp.toIso8601String(),
+        },
+        "geometry": r.location.toJson(),
+      };
+    }).toList();
 
     final collection = {"type": "FeatureCollection", "features": features};
 
@@ -437,6 +438,15 @@ class _MapScreenState extends State<MapScreen>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.mapScreenTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => context.push('/settings'),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           mbx.MapWidget(
