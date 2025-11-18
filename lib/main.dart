@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:ht_localization/ht_localization.dart';
+import 'package:migra_app/core/providers/theme_provider.dart';
 import 'package:migra_app/core/router.dart';
 import 'package:migra_app/core/themes/app_theme.dart';
 import 'package:migra_app/firebase_options.dart';
@@ -30,7 +31,13 @@ void main() async {
   };
 
   runApp(
-    ChangeNotifierProvider(create: (_) => AppData(), child: const MyApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppData()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -40,11 +47,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appDataProvider = Provider.of<AppData>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp.router(
       title: 'Immigration Alert App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.themeMode,
       routerConfig: appRouter,
       locale: appDataProvider.locale,
       localizationsDelegates: const [
