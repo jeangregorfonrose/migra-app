@@ -6,15 +6,21 @@ class AppTheme {
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: AppColors.lightBackground,
     brightness: Brightness.light,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      iconTheme: IconThemeData(color: AppColors.black),
+      titleTextStyle: TextStyle(color: AppColors.black, fontSize: 20, fontWeight: FontWeight.bold),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
-        textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.white),
+        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.white),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         foregroundColor: AppColors.white,
       ),
     ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.primary,
       foregroundColor: AppColors.white,
     ),
@@ -24,14 +30,20 @@ class AppTheme {
     primaryColor: AppColors.primaryDark,
     scaffoldBackgroundColor: AppColors.darkBackground,
     brightness: Brightness.dark,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: AppColors.darkGrey,
+      elevation: 0,
+      iconTheme: IconThemeData(color: AppColors.white),
+      titleTextStyle: TextStyle(color: AppColors.white, fontSize: 20, fontWeight: FontWeight.bold),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primaryDark,
-        textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.primaryDark,
       foregroundColor: AppColors.black,
     ),
