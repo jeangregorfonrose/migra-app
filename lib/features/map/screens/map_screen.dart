@@ -11,6 +11,7 @@ import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
+import 'package:migra_app/shared/widgets/custom_toast.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -109,9 +110,10 @@ class _MapScreenState extends State<MapScreen>
   // Confirm placement of report pin
   void _confirmLocationAndOpentSheet() {
     if (_draftCoord == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: No location selected')));
+      CustomToast.show(
+          context: context,
+          message: 'Error: No location selected',
+          type: ToastType.error);
       return;
     }
 
@@ -279,12 +281,10 @@ class _MapScreenState extends State<MapScreen>
       Navigator.pop(context);
 
       // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        // get Translations
-        SnackBar(
-          content: Text(l10n.reportSubmitted),
-          backgroundColor: Colors.green,
-        ),
+      CustomToast.show(
+        context: context,
+        message: l10n.reportSubmitted,
+        type: ToastType.success,
       );
     })
         .catchError((error) {
@@ -293,11 +293,10 @@ class _MapScreenState extends State<MapScreen>
       Navigator.pop(context);
 
       // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.failedReportSubmission),
-          backgroundColor: Colors.red,
-        ),
+      CustomToast.show(
+        context: context,
+        message: l10n.failedReportSubmission,
+        type: ToastType.error,
       );
     });
   }
