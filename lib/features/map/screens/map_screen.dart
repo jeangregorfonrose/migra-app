@@ -140,92 +140,93 @@ class _MapScreenState extends State<MapScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        return Padding(
+        final l10n = AppLocalizations.of(context)!;
+        return Container(
           padding: EdgeInsets.only(
-            bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
-            top: 16,
-            left: 16,
-            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: StatefulBuilder(
-            builder: (context, setModalState) {
-              // Get Translations
-              final l10n = AppLocalizations.of(context)!;
-
-              return Column(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Transform.translate(
-                        offset: const Offset(
-                          -15,
-                          0,
-                        ), // Adjust x and y values as needed
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.event_note),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(-15, 0),
-                        child: Text(
-                          l10n.submitReport,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                  // Drag Handle
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-
-                  // Spacing
-                  const SizedBox(height: 8),
-
+                  const SizedBox(height: 20),
+                  // Title
+                  Text(
+                    l10n.submitReport,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   // Location
                   Text(
                     '${l10n.location}: (${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.center,
                   ),
-
-                  // Description of report
-                  Text(l10n.whatHappened),
-                  const SizedBox(height: 6),
-                  TextField(
-                    controller: descriptionCtrl,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: l10n.briefDetails,
-                      border: const OutlineInputBorder(),
+                  const SizedBox(height: 20),
+                  // Description
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      l10n.whatHappened,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
-
-                  // Spacing
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: descriptionCtrl,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: l10n.briefDetails,
+                      filled: true,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
-
                   // Submit Button
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 55,
                     child: ElevatedButton.icon(
-                      label: Text(l10n.submitReport),
                       icon: const Icon(Icons.send),
-                      onPressed: () => _submitReport(context, descriptionCtrl.text),
+                      label: Text(l10n.submitReport),
+                      onPressed: () =>
+                          _submitReport(context, descriptionCtrl.text),
                     ),
                   ),
-
-                  const SizedBox(height: 20),
                 ],
-              );
-            },
+              ),
+            ),
           ),
         );
       },
@@ -308,7 +309,7 @@ class _MapScreenState extends State<MapScreen>
 
     // Build updated FeatureCollection with all reports
     final features =
-        _reports.map((r) {
+    _reports.map((r) {
       return {
         "type": "Feature",
         "properties": {
@@ -330,15 +331,15 @@ class _MapScreenState extends State<MapScreen>
       );
 
       final reportsLayer =
-          mbx.CircleLayer(id: 'reports_layer', sourceId: 'reports_source')
-            ..filter = ["all"]
-            ..circleColor =
-                0xFFE53935 // Red
-            ..circleRadius = 8.0
-            ..circleOpacity = 0.9
-            ..circleStrokeColor =
-                0xFF111111 // Black border
-            ..circleStrokeWidth = 1.0;
+      mbx.CircleLayer(id: 'reports_layer', sourceId: 'reports_source')
+        ..filter = ["all"]
+        ..circleColor =
+            0xFFE53935 // Red
+        ..circleRadius = 8.0
+        ..circleOpacity = 0.9
+        ..circleStrokeColor =
+            0xFF111111 // Black border
+        ..circleStrokeWidth = 1.0;
 
       await style.addLayer(reportsLayer);
 
@@ -360,11 +361,11 @@ class _MapScreenState extends State<MapScreen>
     // Get reports source
     final style = _map!.style;
     final reportsSource =
-        await style.getSource('reports_source') as mbx.GeoJsonSource;
+    await style.getSource('reports_source') as mbx.GeoJsonSource;
 
     // Build updated FeatureCollection with all reports
     final features =
-        _reports.map((r) {
+    _reports.map((r) {
       return {
         "type": "Feature",
         "properties": {
@@ -388,29 +389,29 @@ class _MapScreenState extends State<MapScreen>
 
     // Create heatmap layer using the same 'reports' source
     final heatmapLayer =
-        mbx.HeatmapLayer(id: 'reports_heatmap', sourceId: 'reports_source')
-          // Show all features
-          ..filter = ["all"]
-          // Intensity: How strong the heat effect is
-          ..heatmapIntensity = 1.0
-          // Radius: Size of each heat point in pixels
-          ..heatmapRadiusExpression = [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            0, 10, // Zoomed out: small radius
-            10, 50, // Medium zoom: medium radius
-          ]
-          // Weight: How much each point contributes
-          ..heatmapWeight = 0.6
-          // Opacity: Fade out as you zoom in
-          ..heatmapOpacityExpression = [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            10, 1.0, // Zoomed out: fully visible
-            14, 0.0, // Zoomed in: invisible
-          ];
+    mbx.HeatmapLayer(id: 'reports_heatmap', sourceId: 'reports_source')
+      // Show all features
+      ..filter = ["all"]
+      // Intensity: How strong the heat effect is
+      ..heatmapIntensity = 1.0
+      // Radius: Size of each heat point in pixels
+      ..heatmapRadiusExpression = [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        0, 10, // Zoomed out: small radius
+        10, 50, // Medium zoom: medium radius
+      ]
+      // Weight: How much each point contributes
+      ..heatmapWeight = 0.6
+      // Opacity: Fade out as you zoom in
+      ..heatmapOpacityExpression = [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        10, 1.0, // Zoomed out: fully visible
+        14, 0.0, // Zoomed in: invisible
+      ];
     // Color: Density gradient
     // ..heatmapColorExpression = [
     //   "interpolate",
@@ -552,21 +553,21 @@ class _MapScreenState extends State<MapScreen>
           _isPlacingMarker
               ? Container()
               : FloatingActionButton(
-                heroTag: 'fab_report',
-                onPressed: _startPlacingReportPin,
-                child: const Icon(
-                  Icons.add_location_alt,
-                  color: AppColors.white,
-                ),
-              ),
+            heroTag: 'fab_report',
+            onPressed: _startPlacingReportPin,
+            child: const Icon(
+              Icons.add_location_alt,
+              color: AppColors.white,
+            ),
+          ),
           const SizedBox(height: 12),
           _isPlacingMarker
               ? Container()
               : FloatingActionButton(
-                heroTag: 'fab_focus',
-                onPressed: _focusOnUserLocation,
-                child: const Icon(Icons.adjust_rounded, color: AppColors.white),
-              ),
+            heroTag: 'fab_focus',
+            onPressed: _focusOnUserLocation,
+            child: const Icon(Icons.adjust_rounded, color: AppColors.white),
+          ),
         ],
       ),
     );
