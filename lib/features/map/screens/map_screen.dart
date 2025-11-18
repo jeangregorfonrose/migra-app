@@ -333,15 +333,15 @@ class _MapScreenState extends State<MapScreen>
 
       final ByteData bytes = await rootBundle.load('assets/icons/person_pin.svg');
       final Uint8List list = bytes.buffer.asUint8List();
-      await style.addImage('person-pin', list);
+      await style.addStyleImage('person-pin', 1.0, mbx.Image(width: 1, height: 1, data: list), sdf: true);
 
       final reportsLayer = mbx.SymbolLayer(
         id: 'reports_layer',
         sourceId: 'reports_source',
       )
-        // ..iconImage = 'police-15' // Default Mapbox icon
         ..iconImage = 'person-pin' // Custom icon
-        ..iconSize = 1.5
+        ..iconSize = 2.0
+        ..iconColor = AppColors.primary
         ..iconAllowOverlap = true
         ..iconAnchor = mbx.IconAnchor.BOTTOM;
 
