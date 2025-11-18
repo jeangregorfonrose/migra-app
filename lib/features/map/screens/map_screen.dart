@@ -582,14 +582,14 @@ class _MapScreenState extends State<MapScreen>
           FloatingActionButton.extended(
             heroTag: 'fab_report',
             onPressed: _startPlacingReportPin,
-            label: Text(l10n.createReport),
+            label: Text("create report"),
             icon: const Icon(Icons.add_location_alt),
           ),
           const SizedBox(height: 16),
           FloatingActionButton.extended(
             heroTag: 'fab_focus',
             onPressed: _focusOnUserLocation,
-            label: Text(l10n.focus),
+            label: Text("focus"),
             icon: const Icon(Icons.my_location),
           ),
         ],
