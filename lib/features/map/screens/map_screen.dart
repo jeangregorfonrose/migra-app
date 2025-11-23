@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import 'package:migra_app/api/api_client.dart';
 import 'package:migra_app/api/report_api.dart';
@@ -28,7 +28,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen>
     with SingleTickerProviderStateMixin {
   // API client
-  final ReportApi _reportApi = ReportApi(ApiClient(Client()));
+  final ReportApi _reportApi = ReportApi(ApiClient(http.Client()));
 
   // list of reports to display on map
   List<Report> _reports = [];
@@ -42,6 +42,7 @@ class _MapScreenState extends State<MapScreen>
   // ---------- Report Submission State ----------
   bool _isPlacingMarker = false;
   mbx.Position? _draftCoord; // longitude, latitude
+  bool _isStyleLoaded = false; // Track if map style is loaded
 
   @override
   void initState() {
@@ -50,13 +51,17 @@ class _MapScreenState extends State<MapScreen>
     // fetch reports from backend
     Future<List<Report>> reportsFuture = _reportApi.fetchReports();
 
-    // set reports when fetched
+    // set reports when fetched - will be added to map when both reports and style are ready
     reportsFuture
         .then((reports) {
       setState(() {
         _reports = reports;
       });
-      _addReportsSource();
+      AppLogger.map('✅ Fetched ${reports.length} reports from backend');
+      // Add reports to map if style is already loaded
+      if (_isStyleLoaded && _map != null) {
+        _addReportsSource();
+      }
     })
         .catchError((error) {
       AppLogger.error('Error fetching reports', error: error);
@@ -139,6 +144,33 @@ class _MapScreenState extends State<MapScreen>
     });
   }
 
+  // Reverse geocode coordinates to get address
+  Future<String> _getAddressFromCoordinates(mbx.Position position) async {
+    try {
+      final url = Uri.parse(
+        'https://api.mapbox.com/geocoding/v5/mapbox.places/${position.lng},${position.lat}.json?access_token=$accessToken&language=en',
+      );
+      
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final features = data['features'] as List;
+        
+        if (features.isNotEmpty) {
+          // Get the most relevant address (usually the first one)
+          final placeName = features[0]['place_name'] as String;
+          return placeName;
+        }
+      }
+    } catch (e) {
+      AppLogger.error('Error fetching address', error: e);
+    }
+    
+    // Fallback to coordinates if geocoding fails
+    return '(${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})';
+  }
+
   void _openSubmitReportSheet(mbx.Position position) {
     final descriptionCtrl = TextEditingController();
 
@@ -185,11 +217,51 @@ class _MapScreenState extends State<MapScreen>
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // Location
-                  Text(
-                    '${l10n.location}: (${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})',
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    textAlign: TextAlign.center,
+                  // Location with address
+                  FutureBuilder<String>(
+                    future: _getAddressFromCoordinates(position),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${l10n.location}: Loading...',
+                              style: const TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                          ],
+                        );
+                      }
+                      
+                      final address = snapshot.data ?? '(${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})';
+                      
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  address,
+                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
                   // Description
@@ -304,6 +376,235 @@ class _MapScreenState extends State<MapScreen>
     });
   }
 
+  // Handle map tap to show report details
+  void _onMapTap(mbx.MapContentGestureContext context) async {
+    if (_map == null) return;
+
+    try {
+      // Get screen coordinates from touch position
+      final screenPoint = context.touchPosition;
+      
+      // Create a small box around the tap point for better hit detection
+      final tapRadius = 10.0;
+      
+      // Manually encode the screen box as a map
+      final boxMap = {
+        "min": {
+          "x": screenPoint.x - tapRadius,
+          "y": screenPoint.y - tapRadius,
+        },
+        "max": {
+          "x": screenPoint.x + tapRadius,
+          "y": screenPoint.y + tapRadius,
+        },
+      };
+
+      // Query rendered features at the tapped point
+      final features = await _map!.queryRenderedFeatures(
+        mbx.RenderedQueryGeometry(
+          value: jsonEncode(boxMap),
+          type: mbx.Type.SCREEN_BOX,
+        ),
+        mbx.RenderedQueryOptions(
+          layerIds: ['reports_layer'],
+        ),
+      );
+
+      if (features.isNotEmpty) {
+        // Get the first tapped feature
+        final feature = features.first;
+        final queriedFeature = feature?.queriedFeature;
+        
+        if (queriedFeature == null) return;
+        
+        // Get properties and convert to proper type
+        final propertiesRaw = queriedFeature.feature['properties'];
+        if (propertiesRaw == null) return;
+        
+        final properties = Map<String, dynamic>.from(propertiesRaw as Map);
+        final reportId = properties['id'] as String;
+
+        // Find the report in our local list
+        final report = _reports.firstWhere(
+          (r) => r.id == reportId,
+          orElse: () => _reports.first,
+        );
+
+        // Show report details
+        _showReportDetails(report);
+      }
+    } catch (e) {
+      AppLogger.error('Error querying map features', error: e);
+    }
+  }
+
+  void _showReportDetails(Report report) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Format timestamp
+    final timestamp = report.timestamp;
+    final formattedDate = '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
+    final formattedTime = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+    final formattedTimestamp = '$formattedDate $formattedTime';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Drag Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Title
+                  Center(
+                    child: Text(
+                      l10n.reportDetails,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Timestamp
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 18,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${l10n.reportedAt}:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        formattedTimestamp,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Location
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 18,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${l10n.location}:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '(${report.location.coordinates[1].toStringAsFixed(5)}, ${report.location.coordinates[0].toStringAsFixed(5)})',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Description Label
+                  Text(
+                    l10n.whatHappened,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Description Content
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      report.description.isEmpty
+                          ? l10n.noDescription
+                          : report.description,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: report.description.isEmpty
+                            ? Colors.grey[500]
+                            : null,
+                        fontStyle: report.description.isEmpty
+                            ? FontStyle.italic
+                            : FontStyle.normal,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Close Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(l10n.close),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _addReportsSource() async {
     if (_map == null) return;
 
@@ -331,19 +632,17 @@ class _MapScreenState extends State<MapScreen>
         mbx.GeoJsonSource(id: "reports_source", data: jsonEncode(collection)),
       );
 
-      final ByteData bytes = await rootBundle.load('assets/icons/person_pin.svg');
-      final Uint8List list = bytes.buffer.asUint8List();
-      await style.addStyleImage('person-pin', 1.0, mbx.Image(width: 1, height: 1, data: list), sdf: true);
-
-      final reportsLayer = mbx.SymbolLayer(
+      // Create a circle layer for report markers
+      final reportsLayer = mbx.CircleLayer(
         id: 'reports_layer',
         sourceId: 'reports_source',
       )
-        ..iconImage = 'person-pin' // Custom icon
-        ..iconSize = 2.0
-        ..iconColor = AppColors.primary
-        ..iconAllowOverlap = true
-        ..iconAnchor = mbx.IconAnchor.BOTTOM;
+        ..circleRadius = 12.0
+        ..circleColor = 0xFFE53935 // Red color matching the person pin
+        ..circleStrokeWidth = 3.0
+        ..circleStrokeColor = 0xFFFFFFFF // White stroke
+        ..circleOpacity = 0.9
+        ..circleStrokeOpacity = 1.0;
 
       await style.addLayer(reportsLayer);
 
@@ -452,9 +751,10 @@ class _MapScreenState extends State<MapScreen>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text("Migra App"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -476,7 +776,11 @@ class _MapScreenState extends State<MapScreen>
               zoom: 12.0,
             ),
             onCameraChangeListener: _onCameraChange,
+            onTapListener: _onMapTap,
             onStyleLoadedListener: (styleLoadedEventData) async {
+              // Mark style as loaded
+              _isStyleLoaded = true;
+              
               // Enable location puck with 2D default style
               try {
                 await _map?.location.updateSettings(
@@ -489,6 +793,14 @@ class _MapScreenState extends State<MapScreen>
                 AppLogger.map('✅ Location puck enabled');
               } catch (e) {
                 AppLogger.error('❌ Error enabling location', error: e);
+              }
+              
+              // Add reports source if reports are already fetched
+              if (_reports.isNotEmpty) {
+                AppLogger.map('✅ Style loaded, adding ${_reports.length} reports to map');
+                _addReportsSource();
+              } else {
+                AppLogger.map('⏳ Style loaded, waiting for reports to be fetched');
               }
             },
             onMapCreated: (mbx.MapboxMap mapboxMap) async {
