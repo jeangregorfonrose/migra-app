@@ -1,9 +1,8 @@
-// lib/router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_app/features/map/screens/map_screen.dart';
 import 'package:migra_app/features/splash/screens/splash_screen.dart';
 import 'package:migra_app/features/onboarding/screens/onboarding_screen.dart';
-import 'package:migra_app/screens/chatgpt_report.dart';
 import 'package:migra_app/features/settings/screens/settings_screen.dart';
 
 final appRouter = GoRouter(
@@ -22,7 +21,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/map',
       name: 'map',
-      pageBuilder: (ctx, state) => const MaterialPage(child: ReportMapV2Page()),
+      pageBuilder: (ctx, state) => const MaterialPage(child: MapScreen()),
     ),
     GoRoute(
       path: '/settings',
