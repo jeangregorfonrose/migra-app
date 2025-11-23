@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +9,6 @@ import 'package:migra_app/api/api_client.dart';
 import 'package:migra_app/api/report_api.dart';
 import 'package:migra_app/core/models/location_model.dart';
 import 'package:migra_app/core/models/report_model.dart';
-import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:migra_app/shared/widgets/bouncing_pin.dart';
@@ -173,6 +171,7 @@ class _MapScreenState extends State<MapScreen>
 
   void _openSubmitReportSheet(mbx.Position position) {
     final descriptionCtrl = TextEditingController();
+    String locationAddress = '';
 
     showModalBottomSheet(
       context: context,
@@ -240,7 +239,8 @@ class _MapScreenState extends State<MapScreen>
                       }
                       
                       final address = snapshot.data ?? '(${position.lat.toStringAsFixed(5)}, ${position.lng.toStringAsFixed(5)})';
-                      
+                      locationAddress = address;
+
                       return Column(
                         children: [
                           Row(
@@ -298,7 +298,7 @@ class _MapScreenState extends State<MapScreen>
                       icon: const Icon(Icons.send),
                       label: Text(l10n.submitReport),
                       onPressed: () =>
-                          _submitReport(context, descriptionCtrl.text),
+                          _submitReport(context, descriptionCtrl.text, locationAddress),
                     ),
                   ),
                 ],
@@ -330,7 +330,7 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
-  void _submitReport(BuildContext context, String description) {
+  void _submitReport(BuildContext context, String description, String address) {
     // get Translations
     final l10n = AppLocalizations.of(context)!;
 
@@ -342,6 +342,7 @@ class _MapScreenState extends State<MapScreen>
         coordinates: [_draftCoord!.lng.toDouble(), _draftCoord!.lat.toDouble()],
       ),
       description: description.isEmpty ? '' : description,
+      address: address.isEmpty ? '' : address,
       timestamp: DateTime.now(),
     );
 
