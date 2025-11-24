@@ -38,5 +38,17 @@
   "ruleAccurate": "Proporciona información precisa - solo reporta lo que presencies directamente",
   "ruleRespectful": "Sé respetuoso y considerado con la seguridad y privacidad de otros",
   "ruleNoFalse": "No envíes reportes falsos o engañosos",
-  "ruleSafety": "Tu seguridad es primero - nunca te pongas en riesgo para hacer un reporte"
+  "ruleSafety": "Tu seguridad es primero - nunca te pongas en riesgo para hacer un reporte",
+  "authenticationError": "Error de Autenticación",
+  "authenticationErrorMessage": "Error al autenticar. Por favor verifica tu conexión a internet e intenta de nuevo.",
+  "selectLanguage": "Seleccionar Idioma",
+  "settings": "Configuración",
+  "darkMode": "Modo Oscuro",
+  "language": "Idioma",
+  "notifications": "Notificaciones",
+  "logOut": "Cerrar Sesión",
+  "tryAgain": "Intentar de nuevo",
+  "migraApp": "Migra App",
+  "createReport": "Crear Reporte",
+  "focus": "Enfocar"
 }

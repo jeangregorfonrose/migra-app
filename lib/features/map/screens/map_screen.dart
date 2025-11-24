@@ -753,7 +753,7 @@ class _MapScreenState extends State<MapScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Migra App"),
+        title: Text(l10n.migraApp),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -895,14 +895,14 @@ class _MapScreenState extends State<MapScreen>
           FloatingActionButton.extended(
             heroTag: 'fab_report',
             onPressed: _startPlacingReportPin,
-            label: Text("create report"),
+            label: Text(l10n.createReport),
             icon: const Icon(Icons.add_location_alt),
           ),
           const SizedBox(height: 16),
           FloatingActionButton.extended(
             heroTag: 'fab_focus',
             onPressed: _focusOnUserLocation,
-            label: Text("focus"),
+            label: Text(l10n.focus),
             icon: const Icon(Icons.my_location),
           ),
         ],

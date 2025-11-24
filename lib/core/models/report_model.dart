@@ -20,11 +20,11 @@ class Report {
   factory Report.fromJson(Map<String, dynamic> json) {
     return Report(
       id: json['_id'],
-      description: json['description'],
-      address: json['address'],
+      description: json['description'] ?? '',
+      address: json['address'] ?? '',
       timestamp: DateTime.parse(json['timestamp']),
       location: Location.fromJson(json['location']),
-      version: json['__v'],
+      version: json['__v'] ?? 0,
     );
   }
 

@@ -38,5 +38,17 @@
   "ruleAccurate": "Provide accurate information - only report what you directly witness",
   "ruleRespectful": "Be respectful and considerate of others' safety and privacy",
   "ruleNoFalse": "Do not submit false or misleading reports",
-  "ruleSafety": "Your safety comes first - never put yourself at risk to make a report"
+  "ruleSafety": "Your safety comes first - never put yourself at risk to make a report",
+  "authenticationError": "Authentication Error",
+  "authenticationErrorMessage": "Failed to authenticate. Please check your internet connection and try again.",
+  "selectLanguage": "Select Language",
+  "settings": "Settings",
+  "darkMode": "Dark Mode",
+  "language": "Language",
+  "notifications": "Notifications",
+  "logOut": "Log Out",
+  "tryAgain": "Try again",
+  "migraApp": "Migra App",
+  "createReport": "Create Report",
+  "focus": "Focus"
 }

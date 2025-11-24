@@ -38,5 +38,17 @@
   "ruleAccurate": "Bay enfòmasyon egzat - sèlman rapòte sa w wè dirèkteman",
   "ruleRespectful": "Respekte lòt moun ak sekirite ak vi prive yo",
   "ruleNoFalse": "Pa soumèt rapò fo oswa twonpè",
-  "ruleSafety": "Sekirite w se pi enpòtan - pa janm mete tèt ou an danje pou fè yon rapò"
+  "ruleSafety": "Sekirite w se pi enpòtan - pa janm mete tèt ou an danje pou fè yon rapò",
+  "authenticationError": "Erè Otantifikasyon",
+  "authenticationErrorMessage": "Echwe otantifikasyon. Tanpri verifye koneksyon entènèt ou epi eseye ankò.",
+  "selectLanguage": "Chwazi Lang",
+  "settings": "Paramèt",
+  "darkMode": "Mòd Fènwa",
+  "language": "Lang",
+  "notifications": "Notifikasyon",
+  "logOut": "Dekonekte",
+  "tryAgain": "Eseye ankò",
+  "migraApp": "Migra App",
+  "createReport": "Kreye Rapò",
+  "focus": "Fokis"
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:migra_app/features/home/screens/home_screen.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 /// Handles auth state and ensures we have an anonymous user before showing the app.
@@ -91,7 +92,7 @@ class _AuthGateState extends State<AuthGate> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _ensureSignedIn,
-                  child: const Text('Try again'),
+                  child: Text(AppLocalizations.of(context)!.tryAgain),
                 ),
               ],
             ),
