@@ -1,0 +1,5 @@
+# Command to generate translation files
+flutter gen-l10n
+
+# Run command, add access token key
+flutter run --dart-define=ACCESS_TOKEN=
