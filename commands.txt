@@ -6,3 +6,6 @@ flutter run --dart-define=ACCESS_TOKEN=
 
 # Generate icons
 flutter pub run flutter_launcher_icons
+
+# specific device run
+flutter run -d 
