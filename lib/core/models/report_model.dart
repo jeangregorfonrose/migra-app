@@ -32,7 +32,6 @@ class Report {
     return {
       'description': description,
       'address': address,
-      'timestamp': timestamp.toIso8601String(),
       'location': location.toJson(),
     };
   }
