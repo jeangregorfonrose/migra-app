@@ -10,6 +10,7 @@ import 'package:migra_app/api/report_api.dart';
 import 'package:migra_app/core/models/location_model.dart';
 import 'package:migra_app/core/models/report_model.dart';
 import 'package:migra_app/core/utils/app_logger.dart';
+import 'package:migra_app/core/utils/location.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:migra_app/shared/widgets/bouncing_pin.dart';
 import 'package:migra_app/shared/widgets/custom_toast.dart';
@@ -45,6 +46,31 @@ class _MapScreenState extends State<MapScreen>
   @override
   void initState() {
     super.initState();
+
+    // Get user's actual location
+    getUserLocation().then((position) {
+      final appData = Provider.of<AppData>(context, listen: false);
+      appData.updateUserPosition(position, true);
+      AppLogger.map('✅ User location retrieved: ${position.latitude}, ${position.longitude}');
+      
+      // Center map on user location if map is already created
+      if (_map != null) {
+        _map!.flyTo(
+          mbx.CameraOptions(
+            center: mbx.Point(
+              coordinates: mbx.Position(
+                position.longitude,
+                position.latitude,
+              ),
+            ),
+            zoom: 12.0,
+          ),
+          mbx.MapAnimationOptions(duration: 1000),
+        );
+      }
+    }).catchError((error) {
+      AppLogger.error('Error getting user location', error: error);
+    });
 
     // fetch reports from backend
     Future<List<Report>> reportsFuture = _reportApi.fetchReports();
