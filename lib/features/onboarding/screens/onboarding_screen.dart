@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:migra_app/core/themes/app_colors.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:migra_app/providers/app_data.dart';
+import 'package:provider/provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -138,6 +140,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildWelcomePage(AppLocalizations l10n) {
+    final appDataProvider = Provider.of<AppData>(context);
+    final currentLocale = appDataProvider.locale.languageCode;
+    
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -181,7 +186,97 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 40),
+          
+          // Language Selection
+          Text(
+            l10n.selectLanguage,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.onBackground,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Language Options
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildLanguageOption(
+                context,
+                'en',
+                '🇺🇸',
+                'English',
+                currentLocale == 'en',
+              ),
+              const SizedBox(width: 12),
+              _buildLanguageOption(
+                context,
+                'es',
+                '🇪🇸',
+                'Español',
+                currentLocale == 'es',
+              ),
+              const SizedBox(width: 12),
+              _buildLanguageOption(
+                context,
+                'ht',
+                '🇭🇹',
+                'Kreyòl',
+                currentLocale == 'ht',
+              ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String languageCode,
+    String flag,
+    String label,
+    bool isSelected,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        final appDataProvider = Provider.of<AppData>(context, listen: false);
+        appDataProvider.setLocale(Locale(languageCode));
+      },
+      child: Container(
+        width: 90,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withOpacity(0.1)
+              : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.grey.withOpacity(0.3),
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              flag,
+              style: const TextStyle(fontSize: 32),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected ? AppColors.primary : AppColors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
