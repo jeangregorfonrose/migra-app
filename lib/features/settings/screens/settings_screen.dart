@@ -123,22 +123,22 @@ class SettingsScreen extends StatelessWidget {
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () => _showLanguageDialog(context),
           ),
-          ListTile(
-            leading: const Icon(Icons.notifications),
-            title: Text(l10n.notifications),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              // Handle notification settings
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout, color: AppColors.error),
-            title: Text(l10n.logOut, style: const TextStyle(color: AppColors.error)),
-            onTap: () {
-              // Handle log out
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.notifications),
+          //   title: Text(l10n.notifications),
+          //   trailing: const Icon(Icons.arrow_forward_ios),
+          //   onTap: () {
+          //     // Handle notification settings
+          //   },
+          // ),
+          // const Divider(),
+          // ListTile(
+          //   leading: const Icon(Icons.logout, color: AppColors.error),
+          //   title: Text(l10n.logOut, style: const TextStyle(color: AppColors.error)),
+          //   onTap: () {
+          //     // Handle log out
+          //   },
+          // ),
         ],
       ),
     );

@@ -49,7 +49,8 @@
   "notifications": "Notificaciones",
   "logOut": "Cerrar Sesión",
   "tryAgain": "Intentar de nuevo",
-  "migraApp": "Migra App",
+  "migraApp": "Migra",
   "createReport": "Crear Reporte",
-  "focus": "Enfocar"
+  "focus": "Enfocar",
+  "anonymousSubmission": "Su reporte será enviado de forma anónima"
 }

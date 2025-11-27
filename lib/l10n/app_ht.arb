@@ -49,7 +49,8 @@
   "notifications": "Notifikasyon",
   "logOut": "Dekonekte",
   "tryAgain": "Eseye ankò",
-  "migraApp": "Migra App",
+  "migraApp": "Migra",
   "createReport": "Kreye Rapò",
-  "focus": "Fokis"
+  "focus": "Fokis",
+  "anonymousSubmission": "Rapò ou a ap soumèt anonim"
 }

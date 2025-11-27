@@ -315,18 +315,59 @@ class _MapScreenState extends State<MapScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.send),
-                      label: Text(l10n.submitReport),
-                      onPressed: () =>
-                          _submitReport(context, descriptionCtrl.text, locationAddress),
+                const SizedBox(height: 16),
+                // Anonymous Notice
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]?.withOpacity(0.5)
+                        : Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[700]!
+                          : Colors.blue[200]!,
+                      width: 1,
                     ),
                   ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.privacy_tip_outlined,
+                        size: 20,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.blue[300]
+                            : Colors.blue[700],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          l10n.anonymousSubmission,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[300]
+                                : Colors.grey[700],
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.send),
+                    label: Text(l10n.submitReport),
+                    onPressed: () =>
+                        _submitReport(context, descriptionCtrl.text, locationAddress),
+                  ),
+                ),
                 ],
               ),
             ),
