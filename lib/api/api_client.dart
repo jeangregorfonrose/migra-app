@@ -7,27 +7,80 @@ class ApiClient {
   static const String baseUrl = AppConstants.apiBaseUrl;
   final http.Client _http;
   final user = FirebaseAuth.instance.currentUser;
+  
+  // Token caching
+  String? _cachedToken;
+  DateTime? _tokenExpiry;
 
   ApiClient(this._http);
 
   Future<http.Response> get(String path) async {
     final uri = Uri.parse('$baseUrl$path');
-    return await _http.get(uri, headers: await _headers());
+    
+    // First attempt
+    var response = await _http.get(uri, headers: await _headers());
+    
+    // If token expired (401), refresh and retry once
+    if (response.statusCode == 401) {
+      AppLogger.auth('Token expired, refreshing...');
+      await _refreshToken();
+      response = await _http.get(uri, headers: await _headers());
+    }
+    
+    return response;
   }
 
   Future<http.Response> post(String path, {Object? body}) async {
     final uri = Uri.parse('$baseUrl$path');
-    return await _http.post(uri, headers: await _headers(), body: body);
+    
+    // First attempt
+    var response = await _http.post(uri, headers: await _headers(), body: body);
+    
+    // If token expired (401), refresh and retry once
+    if (response.statusCode == 401) {
+      AppLogger.auth('Token expired, refreshing...');
+      await _refreshToken();
+      response = await _http.post(uri, headers: await _headers(), body: body);
+    }
+    
+    return response;
+  }
+
+  Future<void> _refreshToken() async {
+    try {
+      // Force token refresh
+      _cachedToken = await user?.getIdToken(true);
+      // Firebase tokens expire in 1 hour, cache for 55 minutes to be safe
+      _tokenExpiry = DateTime.now().add(const Duration(minutes: 55));
+      AppLogger.auth('Token refreshed successfully');
+    } catch (e) {
+      AppLogger.error('Error refreshing token', error: e);
+      // Clear cache on error
+      _cachedToken = null;
+      _tokenExpiry = null;
+    }
   }
 
   Future<Map<String, String>> _headers() async {
     String? idToken;
-    // get auth token if user is logged in
-    try {
-       idToken = await user?.getIdToken();
-      AppLogger.auth('Fresh token: $idToken');
-    } catch (e) {
-      AppLogger.error('Error fetching token: $e');
+    
+    // Use cached token if still valid
+    if (_cachedToken != null && 
+        _tokenExpiry != null && 
+        DateTime.now().isBefore(_tokenExpiry!)) {
+      idToken = _cachedToken;
+      AppLogger.auth('Using cached token');
+    } else {
+      // Get fresh token
+      try {
+        idToken = await user?.getIdToken();
+        _cachedToken = idToken;
+        // Firebase tokens expire in 1 hour, cache for 55 minutes
+        _tokenExpiry = DateTime.now().add(const Duration(minutes: 55));
+        AppLogger.auth('Fresh token obtained');
+      } catch (e) {
+        AppLogger.error('Error fetching token', error: e);
+      }
     }
 
     return {
