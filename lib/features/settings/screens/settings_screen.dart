@@ -44,6 +44,17 @@ class SettingsScreen extends StatelessWidget {
               ),
               _buildLanguageOption(
                 context: context,
+                locale: const Locale('fr'),
+                flag: '🇫🇷',
+                name: 'Français',
+                isSelected: appDataProvider.locale.languageCode == 'fr',
+                onTap: () {
+                  appDataProvider.setLocale(const Locale('fr'));
+                  Navigator.pop(context);
+                },
+              ),
+              _buildLanguageOption(
+                context: context,
                 locale: const Locale('ht'),
                 flag: '🇭🇹',
                 name: 'Kreyòl Ayisyen',
@@ -89,6 +100,8 @@ class SettingsScreen extends StatelessWidget {
         return 'English';
       case 'es':
         return 'Español';
+      case 'fr':
+        return 'Français';
       case 'ht':
         return 'Kreyòl Ayisyen';
       default:

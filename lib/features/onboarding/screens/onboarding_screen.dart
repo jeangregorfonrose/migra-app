@@ -150,19 +150,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           // Icon
           Container(
-            width: 120,
-            height: 120,
+            width: 100,
+            height: 100,
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.waving_hand,
-              size: 60,
+              size: 50,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
           
           // Title
           Text(
@@ -180,13 +180,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             l10n.welcomeDescription,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: AppColors.grey,
-              height: 1.5,
+              height: 1.4,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
           
           // Language Selection
           Text(
@@ -200,8 +200,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 16),
           
           // Language Options
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
             children: [
               _buildLanguageOption(
                 context,
@@ -210,7 +212,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 'English',
                 currentLocale == 'en',
               ),
-              const SizedBox(width: 12),
               _buildLanguageOption(
                 context,
                 'es',
@@ -218,7 +219,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 'Español',
                 currentLocale == 'es',
               ),
-              const SizedBox(width: 12),
+              // _buildLanguageOption(
+              //   context,
+              //   'fr',
+              //   '🇫🇷',
+              //   'Français',
+              //   currentLocale == 'fr',
+              // ),
               _buildLanguageOption(
                 context,
                 'ht',
@@ -246,8 +253,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         appDataProvider.setLocale(Locale(languageCode));
       },
       child: Container(
-        width: 90,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        width: 80,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withOpacity(0.1)
@@ -263,13 +270,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Text(
               flag,
-              style: const TextStyle(fontSize: 32),
+              style: const TextStyle(fontSize: 28),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: isSelected ? AppColors.primary : AppColors.grey,
               ),
