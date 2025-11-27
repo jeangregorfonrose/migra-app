@@ -207,6 +207,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             children: [
               _buildLanguageOption(
                 context,
+                'ht',
+                '🇭🇹',
+                'Kreyòl',
+                currentLocale == 'ht',
+              ),
+              _buildLanguageOption(
+                context,
                 'en',
                 '🇺🇸',
                 'English',
@@ -226,13 +233,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               //   'Français',
               //   currentLocale == 'fr',
               // ),
-              _buildLanguageOption(
-                context,
-                'ht',
-                '🇭🇹',
-                'Kreyòl',
-                currentLocale == 'ht',
-              ),
             ],
           ),
         ],
