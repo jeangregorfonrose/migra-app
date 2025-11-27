@@ -330,6 +330,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Icons.touch_app,
             l10n.instructionDetails,
           ),
+          const SizedBox(height: 20),
+          _buildInstructionItem(
+            Icons.refresh,
+            l10n.instructionRefresh,
+          ),
         ],
       ),
     );

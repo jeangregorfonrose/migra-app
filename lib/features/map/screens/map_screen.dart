@@ -397,6 +397,59 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
+  void _refreshReports() async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    // Show loading toast
+    CustomToast.show(
+      context: context, 
+      message: l10n.loading, 
+      type: ToastType.info
+    );
+    
+    try {
+      final reports = await _reportApi.fetchReports();
+      setState(() {
+        _reports = reports;
+      });
+      
+      if (_isStyleLoaded && _map != null) {
+        // Update map source
+        final style = _map!.style;
+        final reportsSource = await style.getSource('reports_source') as mbx.GeoJsonSource;
+        
+        final features = _reports.map((r) {
+          return {
+            "type": "Feature",
+            "properties": {
+              "id": r.id,
+              "description": r.description,
+              "timestamp": r.timestamp.toIso8601String(),
+            },
+            "geometry": r.location.toJson(),
+          };
+        }).toList();
+
+        final collection = {"type": "FeatureCollection", "features": features};
+        await reportsSource.updateGeoJSON(jsonEncode(collection));
+        
+        AppLogger.map('✅ Reports refreshed: ${reports.length} reports');
+        CustomToast.show(
+          context: context, 
+          message: '${l10n.reports}: ${reports.length}', 
+          type: ToastType.success
+        );
+      }
+    } catch (e) {
+      AppLogger.error('Error refreshing reports', error: e);
+      CustomToast.show(
+        context: context, 
+        message: l10n.error, 
+        type: ToastType.error
+      );
+    }
+  }
+
   void _submitReport(BuildContext context, String description, String address) {
     // get Translations
     final l10n = AppLocalizations.of(context)!;
@@ -987,18 +1040,25 @@ class _MapScreenState extends State<MapScreen>
           : Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton.extended(
-            heroTag: 'fab_report',
-            onPressed: _startPlacingReportPin,
-            label: Text(l10n.createReport),
-            icon: const Icon(Icons.add_location_alt),
+          FloatingActionButton(
+            heroTag: 'fab_refresh',
+            onPressed: _refreshReports,
+            tooltip: l10n.refresh,
+            child: const Icon(Icons.refresh),
           ),
           const SizedBox(height: 16),
-          FloatingActionButton.extended(
+          FloatingActionButton(
             heroTag: 'fab_focus',
             onPressed: _focusOnUserLocation,
-            label: Text(l10n.focus),
-            icon: const Icon(Icons.my_location),
+            tooltip: l10n.focus,
+            child: const Icon(Icons.my_location),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: 'fab_report',
+            onPressed: _startPlacingReportPin,
+            tooltip: l10n.createReport,
+            child: const Icon(Icons.add_location_alt),
           ),
         ],
       ),

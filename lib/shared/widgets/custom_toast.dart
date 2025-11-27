@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ToastType { success, error }
+enum ToastType { success, error, info }
 
 class CustomToast {
   static void show({
@@ -21,7 +21,11 @@ class CustomToast {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
             decoration: BoxDecoration(
-              color: type == ToastType.success ? Colors.green : Colors.red,
+              color: type == ToastType.success 
+                  ? Colors.green 
+                  : type == ToastType.error 
+                      ? Colors.red 
+                      : Colors.blue,
               borderRadius: BorderRadius.circular(25.0),
               boxShadow: const [
                 BoxShadow(
@@ -35,7 +39,11 @@ class CustomToast {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  type == ToastType.success ? Icons.check_circle : Icons.error,
+                  type == ToastType.success 
+                      ? Icons.check_circle 
+                      : type == ToastType.error 
+                          ? Icons.error 
+                          : Icons.info,
                   color: Colors.white,
                 ),
                 const SizedBox(width: 12.0),

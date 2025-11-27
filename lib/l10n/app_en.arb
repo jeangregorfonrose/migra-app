@@ -52,5 +52,7 @@
   "migraApp": "Migra",
   "createReport": "Create Report",
   "focus": "Focus",
-  "anonymousSubmission": "Your report will be submitted anonymously"
+  "anonymousSubmission": "Your report will be submitted anonymously",
+  "refresh": "Refresh",
+  "instructionRefresh": "Tap the refresh button to see the latest reports"
 }

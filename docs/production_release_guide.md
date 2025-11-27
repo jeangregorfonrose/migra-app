@@ -236,7 +236,7 @@ Last Updated: [Date]
 **App Bundle (Recommended):**
 ```bash
 flutter build appbundle --release \
-  --dart-define=ACCESS_TOKEN=pk.eyJ1IjoiZm9ucm9zZWplYW5ncmVnb3IiLCJhIjoiY21mdWJzbmt4MHEwZjJxbjRlODlscmI3OSJ9.rkVi3xCt5uOSnuogUpYNvQ
+  --dart-define=ACCESS_TOKEN=<access_token>
 ```
 
 Output: `build/app/outputs/bundle/release/app-release.aab`
@@ -244,7 +244,7 @@ Output: `build/app/outputs/bundle/release/app-release.aab`
 **APK (Alternative):**
 ```bash
 flutter build apk --release \
-  --dart-define=ACCESS_TOKEN=pk.eyJ1IjoiZm9ucm9zZWplYW5ncmVnb3IiLCJhIjoiY21mdWJzbmt4MHEwZjJxbjRlODlscmI3OSJ9.rkVi3xCt5uOSnuogUpYNvQ
+  --dart-define=ACCESS_TOKEN=<access_token>
 ```
 
 Output: `build/app/outputs/flutter-apk/app-release.apk`
