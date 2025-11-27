@@ -446,7 +446,6 @@ class _MapScreenState extends State<MapScreen>
     final timestamp = report.timestamp;
     final formattedDate = '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
     final formattedTime = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
-    final formattedTimestamp = '$formattedDate $formattedTime';
 
     showModalBottomSheet(
       context: context,
@@ -494,7 +493,35 @@ class _MapScreenState extends State<MapScreen>
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Timestamp
+                  // Date
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${l10n.date}:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        formattedDate,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Time
                   Row(
                     children: [
                       Icon(
@@ -504,7 +531,7 @@ class _MapScreenState extends State<MapScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${l10n.reportedAt}:',
+                        '${l10n.time}:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -513,7 +540,7 @@ class _MapScreenState extends State<MapScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        formattedTimestamp,
+                        formattedTime,
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -542,7 +569,7 @@ class _MapScreenState extends State<MapScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '(${report.location.coordinates[1].toStringAsFixed(5)}, ${report.location.coordinates[0].toStringAsFixed(5)})',
+                          report.address.isEmpty ? '(${report.location.coordinates[1].toStringAsFixed(5)}, ${report.location.coordinates[0].toStringAsFixed(5)})' : report.address,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -597,6 +624,7 @@ class _MapScreenState extends State<MapScreen>
                       child: Text(l10n.close),
                     ),
                   ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
