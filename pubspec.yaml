@@ -115,4 +115,6 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/app_icon_gen.png"
+  image_path: "assets/icons/migra_icon.png"
+  adaptive_icon_background: "assets/icons/migra_adaptive_background.png"
+  adaptive_icon_foreground: "assets/icons/migra_adaptive_foreground.png"
