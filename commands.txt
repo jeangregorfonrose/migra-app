@@ -9,3 +9,6 @@ flutter pub run flutter_launcher_icons
 
 # specific device run
 flutter run -d 
+
+# App bundle realease command
+flutter build appbundle --release --dart-define=ACCESS_TOKEN=
