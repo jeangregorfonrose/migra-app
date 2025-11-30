@@ -42,17 +42,17 @@ class SettingsScreen extends StatelessWidget {
                   Navigator.pop(context);
                 },
               ),
-              _buildLanguageOption(
-                context: context,
-                locale: const Locale('fr'),
-                flag: '🇫🇷',
-                name: 'Français',
-                isSelected: appDataProvider.locale.languageCode == 'fr',
-                onTap: () {
-                  appDataProvider.setLocale(const Locale('fr'));
-                  Navigator.pop(context);
-                },
-              ),
+              // _buildLanguageOption(
+              //   context: context,
+              //   locale: const Locale('fr'),
+              //   flag: '🇫🇷',
+              //   name: 'Français',
+              //   isSelected: appDataProvider.locale.languageCode == 'fr',
+              //   onTap: () {
+              //     appDataProvider.setLocale(const Locale('fr'));
+              //     Navigator.pop(context);
+              //   },
+              // ),
               _buildLanguageOption(
                 context: context,
                 locale: const Locale('ht'),
