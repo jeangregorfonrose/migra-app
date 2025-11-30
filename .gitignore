@@ -52,3 +52,8 @@ android/app/.cxx/
 ios/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
 android/app/google-services.json
+
+# Keystore files
+*.jks
+*.keystore
+android/key.properties
