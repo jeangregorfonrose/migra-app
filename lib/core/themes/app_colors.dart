@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Modern Primary Colors - Vibrant Blue
-  static const primary = Color(0xFF2563EB); // Bright blue
+  static const primary = Color(0xFF1C95EC); // Bright blue
   static const primaryDark = Color(0xFF1E40AF); // Deep blue
   static const primaryLight = Color(0xFF60A5FA); // Light blue
   
