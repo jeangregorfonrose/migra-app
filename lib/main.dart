@@ -13,8 +13,11 @@ import 'package:migra_app/firebase_options.dart';
 import 'package:migra_app/providers/app_data.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // IMPORTANT: pass the platform-specific options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
